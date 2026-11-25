@@ -1,0 +1,28 @@
+# Archivos locales y copias comprimidas
+*.[zZ][iI][pP]
+.vscode/
+local/
+# Variables de entorno, secretos y credenciales
+.env
+.env.*
+!.env.example
+credentials*
+credenciales*
+secrets*
+*.pem
+*.key
+*.p12
+*.pfx
+# Dependencias y resultados generados
+node_modules/
+**/resultados/
+coverage/
+playwright-report/
+test-results/
+*.log
+.DS_Store
+Thumbs.db.vscode/
+*.zip
+local/
+.env
+.env.*

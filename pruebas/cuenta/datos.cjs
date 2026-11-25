@@ -1,0 +1,41 @@
+/* Ejecutar con Node 22+; sin dependencias. Datos sintéticos en memoria. */
+const {readFileSync}=require('node:fs');
+const {resolve}=require('node:path');
+const vm=require('node:vm');
+const assert=require('node:assert/strict');
+const {webcrypto}=require('node:crypto');
+const base=resolve(__dirname,'../..');
+const contexto={crypto:webcrypto,TextEncoder,Intl,Date,console};contexto.globalThis=contexto;contexto.window=contexto;
+vm.createContext(contexto);
+for(const f of ['js/cuenta/datos.js','js/calendario/datos.js','js/cuenta/catalogo.js','js/cuenta/ui.js','js/chatbot/conocimiento.js','js/chatbot/motor.js'])vm.runInContext(readFileSync(resolve(base,f),'utf8'),contexto,{filename:f});
+const C=contexto.CuidaCuenta,A=contexto.CuidaAgenda;
+const memoria=()=>{const m=new Map();return {getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)};};
+let total=0;
+async function test(nombre,fn){await fn();console.log('OK '+nombre);total++;}
+(async()=>{
+ const storage=memoria(),session=memoria(),r=C.crearRepositorio(storage,session),clave='Prueba-Segura-123!';
+ await test('Registro: PBKDF2, sin contraseña en claro y sesión',async()=>{await r.registro('Ana','ANA@example.test',clave);assert.equal(r.actual().email,'ana@example.test');assert.equal(r.actual().hash.length,64);assert(!storage.getItem(C.CLAVE).includes(clave));});
+ await test('Validaciones y duplicados',async()=>{await assert.rejects(r.registro('','mal',clave));await assert.rejects(r.registro('Ana','ana@example.test',clave));await assert.rejects(r.registro('Otra','otra@example.test','corta'));});
+ await test('Credenciales incorrectas y cierre/inicio',async()=>{r.salir();assert.equal(r.actual(),null);await assert.rejects(r.login('ana@example.test','Incorrecta-123'));await r.login('ana@example.test',clave);});
+ const p=C.persona({nickname:'Madre de prueba',needs:{movilidad:'Diaria'}}),p2=C.persona({nickname:'Padre de prueba',age:76,needs:{rutinas:'Semanal'}});
+ await test('Guardar, editar y alternar varias personas',()=>{r.guardarPersona(p);r.guardarPersona(p2);assert.equal(r.actual().people.length,2);r.seleccionar(p.id);r.guardarPersona({...r.activa(),nickname:'Apodo editado'});assert.equal(r.activa().nickname,'Apodo editado');assert.equal(r.actual().people.length,2);});
+ let agenda;
+ await test('Misma agenda entre panel y calendario, sin duplicación',()=>{agenda=A.crearAlmacen(r.agendaStorage());const tarea=A.crearTarea({title:'Paseo sintético',date:A.hoy()});agenda.modificar(ts=>ts.concat(tarea));assert.equal(r.activa().agenda.tasks.length,1);r.cambiarPersona(p.id,x=>{x.agenda.tasks[0].status='hecha';});assert.equal(agenda.cargar().tasks[0].status,'hecha');assert.equal(storage.getItem(A.CLAVE),null);});
+ await test('Perfiles separados y protección ante cambio de perfil',()=>{r.seleccionar(p2.id);assert.equal(r.activa().agenda.tasks.length,0);assert.throws(()=>agenda.modificar(ts=>[]));r.seleccionar(p.id);});
+ await test('Persistencia al reconstruir repositorio',()=>{const otro=C.crearRepositorio(storage,session);assert.equal(otro.activa().agenda.tasks.length,1);});
+ await test('Seguimiento, bienestar y favoritos independientes',()=>{r.cambiarPersona(p.id,x=>{x.tracking[A.hoy()]={mood:'bien'};x.favorites=['recurso-autocuidado'];});r.cambiar(u=>{u.wellbeing[A.hoy()]={minutes:20};});r.seleccionar(p2.id);assert.equal(Object.keys(r.activa().tracking).length,0);assert.equal(r.activa().favorites.length,0);assert.equal(r.actual().wellbeing[A.hoy()].minutes,20);});
+ await test('Separación entre cuentas del prototipo',async()=>{r.salir();await r.registro('Luis','luis@example.test',clave);assert.equal(r.actual().people.length,0);await r.login('ana@example.test',clave);assert.equal(r.actual().people.length,2);});
+ await test('Editar correo y nombre mantiene perfiles y sesión',async()=>{await r.editarCuenta('Ana nueva','ana2@example.test',clave);assert.equal(r.actual().email,'ana2@example.test');assert.equal(r.actual().people.length,2);assert.equal(JSON.parse(storage.getItem(C.CLAVE))['ana@example.test'],undefined);});
+ await test('Cambio de contraseña',async()=>{await assert.rejects(r.cambiarClave('mala',clave));await r.cambiarClave(clave,'Otra-Prueba-456!');r.salir();await assert.rejects(r.login('ana2@example.test',clave));await r.login('ana2@example.test','Otra-Prueba-456!');});
+ await test('Exportación sin derivados ni sal',()=>{const doc=r.exportar();assert.equal(doc.hash,undefined);assert.equal(doc.salt,undefined);assert.equal(doc.people.length,2);assert.equal(doc.people[0].agenda.tasks.length,1);});
+ await test('Eliminar persona conserva las demás',()=>{r.eliminarPersona(p.id);assert.equal(r.actual().people.length,1);assert.equal(r.activa().id,p2.id);});
+ await test('Eliminar cuenta requiere clave, conserva otra cuenta',async()=>{await assert.rejects(r.eliminarCuenta('mala'));await r.eliminarCuenta('Otra-Prueba-456!');assert.equal(r.actual(),null);await r.login('luis@example.test',clave);assert.equal(r.actual().name,'Luis');});
+ await test('Migración v1 preserva contraseña y perfil',async()=>{const sal='legacy-salt',hash=await C.derivar('Antigua-123',sal);storage.setItem(C.CLAVE,JSON.stringify({'vieja@example.test':{name:'Vieja',salt:sal,hash,profile:{relationship:'Mi madre',nickname:'Anterior',age:80,needs:['0','2'],goal:'Organizarme'}}}));await r.login('vieja@example.test','Antigua-123');assert.equal(r.actual().version,2);assert.equal(r.activa().nickname,'Anterior');assert.equal(r.activa().needs.movilidad,'Según necesidad');assert.equal(r.activa().needs.vestimenta,'Según necesidad');assert.equal(r.activa().organization.goals,'Organizarme');assert.equal(r.actual().hash,hash);});
+ await test('Migración sin perfil permite iniciar asistente',async()=>{const sal='salt',hash=await C.derivar(clave,sal);storage.setItem(C.CLAVE,JSON.stringify({'vacia@example.test':{name:'Vacía',salt:sal,hash,profile:null}}));await r.login('vacia@example.test',clave);assert.equal(r.actual().setupDone,false);});
+ await test('Datos corruptos protegidos contra sobrescritura',()=>{storage.setItem(C.CLAVE,'{roto');assert.throws(()=>r.actual());assert.equal(storage.getItem(C.CLAVE),'{roto');});
+ await test('Errores de permisos y cuota nunca confirman guardado',async()=>{const bloqueado=C.crearRepositorio({getItem(){throw Error('bloqueado');}},session);assert.throws(()=>bloqueado.actual(),/almacenamiento/);const lleno=C.crearRepositorio({getItem:()=>null,setItem(){throw Error('quota');}},memoria());await assert.rejects(lleno.registro('Ana','ana@example.test',clave),/No se ha guardado/);});
+ await test('Edad, categorías y frecuencia se validan',()=>{assert.throws(()=>C.persona({age:999}));const x=C.persona({needs:{desconocido:'Diaria',movilidad:'inventada',higiene:'Diaria'}});assert.equal(Object.keys(x.needs).join(),'higiene');});
+ await test('Escape XSS y recomendaciones sin vídeos ficticios',()=>{const html=contexto.CuidaUI.e('<img src=x onerror=alert(1)>');assert(!html.includes('<'));assert(contexto.CuidaCatalogo.filter(x=>x.kind==='tutorial').every(x=>!x.available));assert(contexto.CuidaRecomendados(p,{caregiver:{}}).some(x=>x.category==='movilidad'));});
+ await test('Categorías del chatbot existen en su base real',()=>{for(const c of C.categorias)assert(contexto.CuidaChat.base.some(x=>x.id===c.chat),'Falta '+c.chat);});
+ console.log(`RESULTADO: ${total} pruebas correctas.`);
+})().catch(e=>{console.error(e);process.exitCode=1;});
