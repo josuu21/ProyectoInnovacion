@@ -164,7 +164,7 @@
                              "higiene"
                          ],
         "enlace":  {
-                       "url":  "index.html#nosotros",
+                       "url":  "../index.html#nosotros",
                        "texto":  "Conocer CuidApoyo"
                    }
     },
@@ -1710,7 +1710,7 @@
                              "servicios"
                          ],
         "enlace":  {
-                       "url":  "index.html#contacto",
+                       "url":  "../index.html#contacto",
                        "texto":  "Consultar el apartado Contacto"
                    }
     },
@@ -1746,7 +1746,7 @@
                              "contacto"
                          ],
         "enlace":  {
-                       "url":  "index.html",
+                       "url":  "../index.html",
                        "texto":  "Ir a Inicio"
                    }
     },

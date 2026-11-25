@@ -4,14 +4,15 @@ Web estática de apoyo a personas cuidadoras. No requiere compilación.
 
 ## Abrir el proyecto
 
-Inicia Live Server desde la raíz del repositorio y abre `html/index.html`.
-Las seis páginas están en `html/`; no existe un index en la raíz.
+Inicia Live Server desde la raíz del repositorio y abre `index.html`.
+La página de inicio está en la raíz; las otras cinco páginas están en `html/`.
 Para publicar en un alojamiento estático, sirve la raíz completa del proyecto
-junto con sus carpetas y usa `/html/index.html` como dirección de entrada.
+junto con sus carpetas y usa `/index.html` como dirección de entrada.
 
 ## Organización
 
-- `html/`: inicio, tutoriales, recursos, chatbot, calendario y Mi cuenta.
+- `index.html`: página de inicio en la raíz.
+- `html/`: tutoriales, recursos, chatbot, calendario y Mi cuenta.
 - `css/`: estilos comunes, calendario y cuenta, sin cambios visuales.
 - `js/`: script común y módulos en `calendario/`, `chatbot/` y `cuenta/`.
 - `img/`: imágenes originales.
