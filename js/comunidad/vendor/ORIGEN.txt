@@ -1,0 +1,13 @@
+﻿Bibliotecas servidas localmente, descargadas el 26-11-2026, sin CDN en ejecución:
+
+qrcode.js: https://github.com/kazuhikoarase/qrcode-generator
+Archivo original: https://raw.githubusercontent.com/kazuhikoarase/qrcode-generator/master/js/dist/qrcode.js
+Licencia MIT: qrcode-LICENSE
+SHA-256: 79EC86F82856005B1C887905CFCCFCFBEC3821CA61C7FD5A952FAA5F778F791C
+
+jsQR.js: https://github.com/cozmo/jsQR
+Archivo original: https://raw.githubusercontent.com/cozmo/jsQR/master/dist/jsQR.js
+Licencia Apache 2.0: jsQR-LICENSE
+SHA-256: 3325B0888FA4745C4E6940897D8C4F426FBAAE76901FCBFE1871A04E90A51655
+
+Se conservan los archivos originales sin modificaciones. Los hashes fijan las copias usadas.
