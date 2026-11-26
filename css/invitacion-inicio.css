@@ -1,0 +1,154 @@
+/* Invitacion con una escala generosa y un punto de accion claro. */
+#contacto.llamada {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(300px, .8fr);
+  align-items: center;
+  gap: clamp(35px, 6vw, 100px);
+  padding: 85px max(6%, calc((100vw - 1250px) / 2));
+  min-height: 530px;
+  text-align: left;
+  background: radial-gradient(ellipse at 5% 95%, #f9cae6a6, transparent 55%),
+    radial-gradient(ellipse at 95% 5%, #cdbbfa99, transparent 55%),
+    linear-gradient(115deg, #f9edf6, #eee9fc);
+  border-block: 1px solid #dfd0ec;
+}
+#contacto::before {
+  content: "";
+  position: absolute;
+  width: 590px;
+  height: 590px;
+  right: -70px;
+  top: -45px;
+  border: 1px solid #a276bb30;
+  border-radius: 50%;
+  box-shadow: 0 0 0 55px #a276bb08, 0 0 0 110px #a276bb06;
+  z-index: -1;
+  pointer-events: none;
+}
+#contacto > div { max-width: none; min-width: 0; }
+#contacto .invitacion-etiqueta {
+  margin: 0 0 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .875rem;
+  line-height: 1.6;
+  letter-spacing: .14em;
+  font-weight: 700;
+  color: #87508d;
+}
+#contacto h2 {
+  margin: 0 0 27px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(2.8rem, 5.2vw, 4.8rem);
+  line-height: 1.04;
+  letter-spacing: -.055em;
+  color: #392651;
+  text-wrap: balance;
+}
+#contacto h2 span {
+  background: linear-gradient(110deg, #b83e8b, #8052be);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+#contacto .invitacion-descripcion {
+  max-width: 560px;
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #73607f;
+}
+#contacto .invitacion-ventajas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0;
+  margin: 28px 0 0;
+  list-style: none;
+}
+#contacto .invitacion-ventajas li {
+  padding: 9px 14px;
+  border: 1px solid #b793ca40;
+  border-radius: 12px;
+  background: #ffffff70;
+  color: #73517f;
+  font-size: .875rem;
+  font-weight: 700;
+}
+#contacto .invitacion-panel {
+  position: relative;
+  padding: 38px 32px 32px;
+  text-align: center;
+  border: 1px solid #ffffffdd;
+  border-radius: 32px;
+  background: linear-gradient(145deg, #ffffffb8, #ffffff6b);
+  box-shadow: inset 0 1px 0 #fff, 0 25px 60px #79488617, 0 0 0 1px #caa9d433;
+  backdrop-filter: blur(20px);
+}
+#contacto .invitacion-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  margin-bottom: 25px;
+  border-radius: 27px;
+  transform: rotate(-7deg);
+  background: linear-gradient(145deg, #fbe0f1, #e7d9fc);
+  border: 1px solid #fff;
+  box-shadow: inset 0 1px 0 #fff, 0 10px 25px #a051aa24;
+  color: #a34096;
+}
+#contacto .invitacion-icono svg { width: 46px; height: 46px; }
+#contacto .invitacion-panel h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: -.04em;
+  color: #49305e;
+  margin: 0 0 12px;
+}
+#contacto .invitacion-panel p { font-size: 1rem; line-height: 1.7; color: #796681; margin: 0 0 26px; }
+#contacto .blanco {
+  width: 100%;
+  min-height: 60px;
+  padding: 17px 24px;
+  border-radius: 17px;
+  background: linear-gradient(115deg, #b13889, #8950c7);
+  border: 1px solid #ffffff60;
+  color: #fff;
+  font-size: 1.0625rem;
+  box-shadow: inset 0 1px 0 #ffffff50, 0 10px 25px #a140982b;
+}
+@media (hover: hover) {
+  #contacto .blanco:hover { background: linear-gradient(115deg, #a62d7e, #7d43bd); transform: translateY(-3px); box-shadow: 0 15px 30px #a140983b; }
+}
+html[data-tema="oscuro"] #contacto.llamada {
+  background: radial-gradient(ellipse at 5% 95%, #843d7040, transparent 55%),
+    radial-gradient(ellipse at 95% 5%, #67439e40, transparent 55%), #271b33;
+  border-color: #9c82c92b;
+}
+html[data-tema="oscuro"] #contacto h2 { color: #f7edff; }
+html[data-tema="oscuro"] #contacto h2 span { background-image: linear-gradient(110deg, #ffa2d4, #c6a3ff); }
+html[data-tema="oscuro"] #contacto .invitacion-etiqueta { color: #d6acd9; }
+html[data-tema="oscuro"] #contacto .invitacion-descripcion,
+html[data-tema="oscuro"] #contacto .invitacion-panel p { color: #d1bed9; }
+html[data-tema="oscuro"] #contacto .invitacion-panel { background: linear-gradient(145deg, #533a6070, #35263eaa); border-color: #c6a3e133; box-shadow: inset 0 1px 0 #ffffff09, 0 25px 60px #0002; }
+html[data-tema="oscuro"] #contacto .invitacion-panel h3 { color: #f4e7ff; }
+html[data-tema="oscuro"] #contacto .invitacion-ventajas li { background: #ffffff07; color: #e0c6eb; border-color: #b793ca40; }
+html[data-tema="oscuro"] #contacto .invitacion-icono { background: linear-gradient(145deg, #694365, #4b3564); color: #ffc2e7; border-color: #ffffff26; box-shadow: inset 0 1px 0 #ffffff20; }
+@media (max-width: 900px) {
+  #contacto.llamada { grid-template-columns: 1fr; gap: 35px; padding: 60px 7%; }
+  #contacto .invitacion-texto { max-width: 650px; }
+  #contacto .invitacion-panel { width: 100%; max-width: 500px; justify-self: center; }
+  #contacto h2 { font-size: clamp(2.6rem, 7vw, 4rem); }
+}
+@media (max-width: 480px) {
+  #contacto.llamada { padding: 48px 6%; }
+  #contacto .invitacion-panel { padding: 30px 23px 24px; border-radius: 26px; }
+  #contacto .invitacion-ventajas { gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #contacto .blanco { transition: none; }
+  #contacto .blanco:hover { transform: none; }
+}

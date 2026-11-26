@@ -1,0 +1,135 @@
+/* Identidad del bloque principal del inicio. */
+#inicio.hero {
+  position: relative;
+  isolation: isolate;
+  background: radial-gradient(ellipse at 8% 15%, #f6d9ed99, transparent 48%),
+    radial-gradient(ellipse at 58% 90%, #dbe9ff99, transparent 50%),
+    linear-gradient(120deg, #fffafd, #f4efff);
+}
+#inicio .hero-contenido {
+  position: relative;
+  max-width: 620px;
+  padding: 28px 0;
+}
+#inicio .hero-marca {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 25px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(2.6rem, 4.6vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -.065em;
+  line-height: 1.1;
+  color: #38265e;
+  white-space: nowrap;
+}
+#inicio .hero-marca-acento {
+  color: #9750b1;
+  background: linear-gradient(110deg, #7950c1 10%, #c43e91 95%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+#inicio .hero-simbolo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 57px;
+  height: 63px;
+  border: 1px solid #ffffff;
+  border-radius: 19px;
+  background: linear-gradient(145deg, #fff, #f6d9ef);
+  box-shadow: inset 0 1px 0 #fff, 0 7px 20px #a448b124, 0 0 0 1px #d6acda55;
+  color: #b73d8c;
+  transform: rotate(-7deg);
+}
+#inicio .hero-simbolo svg { width: 35px; height: 35px; }
+#inicio h2 {
+  max-width: 580px;
+  margin: 0 auto 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(1.7rem, 2.8vw, 2.65rem);
+  line-height: 1.2;
+  letter-spacing: -.045em;
+  font-weight: 700;
+  color: #352b50;
+  text-wrap: balance;
+}
+#inicio h2 span { color: #8a47a5; }
+#inicio .descripcion {
+  max-width: 485px;
+  margin: 0 auto 30px;
+  color: #6b617d;
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  text-wrap: pretty;
+}
+#inicio .hero-acciones { gap: 12px; }
+#inicio .hero-acciones a {
+  min-height: 52px;
+  padding: 15px 20px;
+  border-radius: 16px;
+  font-size: .9375rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+}
+#inicio .hero-acciones .rosa {
+  border: 1px solid #ffffff70;
+  background: linear-gradient(115deg, #b13889, #8950c7);
+  color: #fff;
+  box-shadow: inset 0 1px 0 #ffffff40, 0 8px 22px #a1409829;
+}
+#inicio .enlace-secundario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #c4b1da80;
+  background: #ffffff80;
+  color: #684185;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+}
+@media (hover: hover) {
+  #inicio .hero-acciones .rosa:hover { box-shadow: 0 12px 26px #a1409840; transform: translateY(-3px); }
+  #inicio .enlace-secundario:hover { background: #fff; border-color: #a978c4; transform: translateY(-3px); }
+}
+html[data-tema="oscuro"] #inicio.hero {
+  background: radial-gradient(ellipse at 10% 10%, #863b7438, transparent 50%),
+    radial-gradient(ellipse at 60% 90%, #495fb833, transparent 50%), #21182e;
+}
+html[data-tema="oscuro"] #inicio .hero-marca,
+html[data-tema="oscuro"] #inicio h2 { color: #f5ecff; }
+html[data-tema="oscuro"] #inicio .hero-marca-acento {
+  background-image: linear-gradient(110deg, #be9aff, #ffa7db);
+}
+html[data-tema="oscuro"] #inicio h2 span { color: #e7a4ed; }
+html[data-tema="oscuro"] #inicio .descripcion { color: #cfc1db; }
+html[data-tema="oscuro"] #inicio .hero-simbolo {
+  background: linear-gradient(145deg, #503359, #38223f);
+  color: #ffacdc;
+  border-color: #b885bd60;
+}
+html[data-tema="oscuro"] #inicio .enlace-secundario {
+  background: #ffffff09;
+  color: #edc8ff;
+  border-color: #be96d54d;
+}
+@media (max-width: 760px) {
+  #inicio .hero-contenido { padding: 15px 0; width: 100%; }
+  #inicio .hero-marca { font-size: clamp(2.35rem, 8vw, 4rem); gap: 11px; }
+  #inicio .hero-simbolo { width: 46px; height: 52px; border-radius: 15px; }
+  #inicio .hero-simbolo svg { width: 29px; height: 29px; }
+  #inicio h2 { font-size: clamp(1.65rem, 5.5vw, 2.5rem); }
+}
+@media (max-width: 430px) {
+  #inicio .hero-acciones { flex-direction: column; align-items: stretch; }
+  #inicio .hero-acciones a { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #inicio .hero-acciones a { transition: none; }
+  #inicio .hero-acciones a:hover { transform: none; }
+}
