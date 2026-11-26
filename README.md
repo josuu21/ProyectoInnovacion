@@ -1,12 +1,12 @@
 # CuidApoyo
 
-Aplicación de apoyo a personas cuidadoras. Las páginas de recursos y el espacio local no requieren compilación; Comunidad utiliza PHP y SQLite.
+Web estática de apoyo a personas cuidadoras. No requiere compilación.
 
 ## Abrir el proyecto
 
 Inicia Live Server desde la raíz del repositorio y abre `index.html`.
-La página de inicio está en la raíz; las otras seis páginas están en `html/`.
-Para publicar solo los módulos estáticos, sirve la raíz completa del proyecto
+La página de inicio está en la raíz; las otras cinco páginas están en `html/`.
+Para publicar en un alojamiento estático, sirve la raíz completa del proyecto
 junto con sus carpetas y usa `/index.html` como dirección de entrada.
 
 ## Organización
@@ -46,12 +46,3 @@ La cuenta es un prototipo que almacena datos en el navegador; usa datos ficticio
 Los correos `example.test` y las contraseñas de las pruebas son ejemplos sintéticos.
 La reorganización no cambia las claves del almacenamiento ni exporta los datos
 locales del navegador. Consulta las limitaciones en `docs/cuenta/README.md`.
-## Comunidad: cuentas y mensajería entre dispositivos
-
-La aplicación incorpora un backend PHP con SQLite para Comunidad. Para usarlo, desde la raíz:
-
-```powershell
-& C:/xampp/php/php.exe -S 127.0.0.1:8085 servidor/router.php
-```
-
-Abre `http://127.0.0.1:8085/html/comunidad.html`. Live Server sigue sirviendo las páginas originales, pero Comunidad requiere PHP. El acceso social es independiente de las cuentas locales de cuidados: no se suben ni migran esos perfiles. Consulta [la guía de Comunidad](docs/comunidad/README.md) para configuración, dos cuentas, pruebas, archivos, seguridad y limitaciones.
