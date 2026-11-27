@@ -1,3 +1,5 @@
+// Contenido del chat: temas con ejemplos de consultas y respuestas de orientación.
+
 /* Base de conocimientos local de Resuelve.
  * Cada intención incluye categoría, claves y sinónimos, ejemplos, respuestas
  * alternas, pasos, necesidades, preguntas relacionadas y un enlace opcional.
@@ -7,6 +9,8 @@
 (function (raiz) {
   'use strict';
   raiz.CuidaConocimiento = [
+
+    // Tema: Saludar. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "saludo",
         "categoria":  "inicio",
@@ -39,6 +43,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Qué puedes hacer. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "capacidades",
         "categoria":  "inicio",
@@ -73,6 +79,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Dar las gracias. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "gracias",
         "categoria":  "inicio",
@@ -102,6 +110,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Despedirse. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "despedida",
         "categoria":  "inicio",
@@ -132,6 +142,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Cuidar a una persona mayor. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "mayores",
         "categoria":  "cuidados",
@@ -168,6 +180,8 @@
                        "texto":  "Conocer CuidApoyo"
                    }
     },
+
+    // Tema: Situación de dependencia. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "dependencia",
         "categoria":  "cuidados",
@@ -199,6 +213,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Respetar su autonomía. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "autonomia",
         "categoria":  "cuidados",
@@ -232,6 +248,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Aseo diario. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "higiene",
         "categoria":  "higiene",
@@ -268,6 +286,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Ducha y baño seguros. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "ducha",
         "categoria":  "higiene",
@@ -300,6 +320,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Higiene de boca y prótesis. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "bucal",
         "categoria":  "higiene",
@@ -332,6 +354,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Ayuda para vestirse. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "vestido",
         "categoria":  "higiene",
@@ -370,6 +394,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Pérdidas de orina. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "incontinencia",
         "categoria":  "higiene",
@@ -402,6 +428,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Cuidado de la piel. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "piel",
         "categoria":  "higiene",
@@ -441,6 +469,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Alimentación cotidiana. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "alimentacion",
         "categoria":  "alimentacion",
@@ -473,6 +503,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Beber y mantenerse hidratado. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "hidratacion",
         "categoria":  "alimentacion",
@@ -505,6 +537,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Falta de apetito. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "apetito",
         "categoria":  "alimentacion",
@@ -542,6 +576,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Dificultad para tragar. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "deglucion",
         "categoria":  "alimentacion",
@@ -579,6 +615,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Ayuda para caminar. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "movilidad",
         "categoria":  "movilidad",
@@ -618,6 +656,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Pasar de la cama a la silla. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "transferencias",
         "categoria":  "movilidad",
@@ -658,6 +698,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Bastón y andador. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "andador",
         "categoria":  "movilidad",
@@ -689,6 +731,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Uso de silla de ruedas. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "silla_ruedas",
         "categoria":  "movilidad",
@@ -719,6 +763,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Prevenir caídas. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "caidas",
         "categoria":  "seguridad",
@@ -751,6 +797,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Ha ocurrido una caída. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "caida_actual",
         "categoria":  "seguridad",
@@ -782,6 +830,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Adaptar la vivienda. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "accesibilidad",
         "categoria":  "accesibilidad",
@@ -815,6 +865,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Adaptar el baño. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "bano_accesible",
         "categoria":  "accesibilidad",
@@ -847,6 +899,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Iluminación y recorridos. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "iluminacion",
         "categoria":  "accesibilidad",
@@ -880,6 +934,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Bienestar emocional. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "emociones",
         "categoria":  "emocional",
@@ -917,6 +973,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Preocupación y nervios. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "ansiedad",
         "categoria":  "emocional",
@@ -950,6 +1008,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Soledad y compañía. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "soledad",
         "categoria":  "acompanamiento",
@@ -983,6 +1043,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Actividades compartidas. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "actividades",
         "categoria":  "acompanamiento",
@@ -1021,6 +1083,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Hablar y escuchar. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "comunicacion",
         "categoria":  "acompanamiento",
@@ -1054,6 +1118,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Olvidos y desorientación. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "memoria",
         "categoria":  "cuidados",
@@ -1087,6 +1153,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Organizar el día. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "rutina",
         "categoria":  "rutinas",
@@ -1123,6 +1191,8 @@
                        "texto":  "Ver ideas para organizarte"
                    }
     },
+
+    // Tema: Descanso y sueño. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "sueno",
         "categoria":  "descanso",
@@ -1160,6 +1230,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Cuidarte mientras cuidas. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "cuidador",
         "categoria":  "cuidadores",
@@ -1199,6 +1271,8 @@
                        "texto":  "Consultar autocuidado"
                    }
     },
+
+    // Tema: Repartir tareas y pedir ayuda. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "reparto",
         "categoria":  "cuidadores",
@@ -1242,6 +1316,8 @@
                        "texto":  "Organizar los apoyos"
                    }
     },
+
+    // Tema: Descanso de la persona cuidadora. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "respiro",
         "categoria":  "cuidadores",
@@ -1281,6 +1357,8 @@
                        "texto":  "Cuidarte mientras cuidas"
                    }
     },
+
+    // Tema: Sentimiento de culpa. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "culpa",
         "categoria":  "cuidadores",
@@ -1313,6 +1391,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Encontrar servicios de asistencia. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "servicios",
         "categoria":  "servicios",
@@ -1349,6 +1429,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Ayuda a domicilio. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "domicilio",
         "categoria":  "servicios",
@@ -1381,6 +1463,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Teleasistencia. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "teleasistencia",
         "categoria":  "servicios",
@@ -1411,6 +1495,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Centros de día. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "centro_dia",
         "categoria":  "servicios",
@@ -1441,6 +1527,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Valorar atención residencial. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "residencia",
         "categoria":  "servicios",
@@ -1471,6 +1559,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Solicitar valoración de dependencia. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "valoracion",
         "categoria":  "servicios",
@@ -1503,6 +1593,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Dudas sobre medicación. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "medicacion",
         "categoria":  "salud",
@@ -1535,6 +1627,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Preparar una consulta profesional. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "consulta",
         "categoria":  "salud",
@@ -1568,6 +1662,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Peligro o cambio repentino. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "emergencia",
         "categoria":  "salud",
@@ -1604,6 +1700,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Ver tutoriales. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "tutoriales",
         "categoria":  "web",
@@ -1638,6 +1736,8 @@
                        "texto":  "Explorar Tutoriales"
                    }
     },
+
+    // Tema: Consultar Recursos. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "recursos_web",
         "categoria":  "web",
@@ -1676,6 +1776,8 @@
                        "texto":  "Leer preguntas frecuentes"
                    }
     },
+
+    // Tema: Contacto con CuidApoyo. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "contacto",
         "categoria":  "web",
@@ -1714,6 +1816,8 @@
                        "texto":  "Consultar el apartado Contacto"
                    }
     },
+
+    // Tema: Navegar por CuidApoyo. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "inicio_web",
         "categoria":  "web",
@@ -1750,6 +1854,8 @@
                        "texto":  "Ir a Inicio"
                    }
     },
+
+    // Tema: Cambiar el aspecto de la web. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "tema_web",
         "categoria":  "web",
@@ -1783,6 +1889,8 @@
                          ],
         "enlace":  null
     },
+
+    // Tema: Privacidad y memoria del chat. Ejemplos para reconocerlo y contenido para responder.
     {
         "id":  "privacidad",
         "categoria":  "web",

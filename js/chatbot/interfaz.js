@@ -1,3 +1,5 @@
+// Chat: mensajes, sugerencias y controles accesibles.
+
 /* Interfaz accesible del chat. La memoria vive solo en esta página. */
 (function () {
   'use strict';
@@ -21,13 +23,50 @@
   const movimientoReducido = window.matchMedia('(prefers-reduced-motion: reduce)');
   let temporizador = null, ocupado = false, mensajeNumero = 0;
 
+  // Presenta la bienvenida solo si el chat se ha cargado correctamente.
+  const escenario = document.getElementById('chatEscenario');
+  const bienvenida = document.getElementById('chatBienvenida');
+  const panel = document.getElementById('chatPanel');
+  const abrir = document.getElementById('chatAbrir');
+  let temporizadorBienvenida = null;
+
+  // Abre la conversación una sola vez y conserva el foco si se usa el botón.
+  function abrirChat(enfocar) {
+    if (!bienvenida || bienvenida.hidden) return;
+    window.clearTimeout(temporizadorBienvenida);
+    temporizadorBienvenida = null;
+    const teniaFoco = bienvenida.contains(document.activeElement);
+    bienvenida.hidden = true;
+    panel.hidden = false;
+    escenario.classList.remove('chat-presentando');
+    escenario.classList.add('chat-abierto');
+    if (enfocar || teniaFoco) entrada.focus({preventScroll:true});
+  }
+
+  // Reduce el movimiento cuando el dispositivo lo solicita y permite saltar el saludo.
+  if (escenario && bienvenida && panel && abrir && !movimientoReducido.matches) {
+    escenario.classList.add('chat-presentando');
+    panel.hidden = true;
+    bienvenida.hidden = false;
+    abrir.addEventListener('click', () => abrirChat(true));
+    temporizadorBienvenida = window.setTimeout(() => abrirChat(false), 1800);
+    movimientoReducido.addEventListener('change', evento => {
+      if (evento.matches) abrirChat(false);
+    });
+  }
+
+  // Comprueba si la lectura está cerca del final del historial de mensajes.
   function alFinal() { return mensajes.scrollHeight - mensajes.clientHeight - mensajes.scrollTop < 70; }
+
+  // Desplaza el historial cuando corresponde y respeta la preferencia de movimiento reducido.
   function desplazar(forzar) {
     if (forzar || alFinal()) {
       mensajes.scrollTo({top:mensajes.scrollHeight,behavior:movimientoReducido.matches?'auto':'smooth'});
       nuevos.hidden=true;
     } else nuevos.hidden=false;
   }
+
+  // Añade un mensaje como texto y su enlace opcional y actualiza el seguimiento del historial.
   function agregarMensaje(autor, texto, enlace) {
     const seguir = alFinal();
     const mensaje = document.createElement('div');
@@ -51,6 +90,8 @@
     mensajes.append(mensaje);
     desplazar(autor==='usuario' || seguir);
   }
+
+  // Sustituye las opciones del chat por botones conectados al envío de consultas.
   function sugerencias(lista) {
     opciones.replaceChildren();
     lista.forEach(opcion => {
@@ -62,6 +103,8 @@
       opciones.append(boton);
     });
   }
+
+  // Sincroniza el indicador de escritura y bloquea el envío mientras se prepara una respuesta.
   function cambiarEstado(valor) {
     ocupado=valor;
     enviarBoton.disabled=valor;
@@ -69,7 +112,10 @@
     opciones.querySelectorAll('button').forEach(b=>{b.disabled=valor;});
     estado.textContent=valor?'Resuelve está preparando una respuesta.':'';
   }
+
+  // Valida el mensaje, evita envíos simultáneos y solicita la respuesta al motor local.
   function enviar(texto, id) {
+    abrirChat(false);
     if (ocupado) return;
     const limpio=texto.trim();
     if (!limpio) { estado.textContent='Escribe una pregunta o elige una sugerencia.'; entrada.focus(); return; }
@@ -108,6 +154,8 @@
     estado.textContent='Se ha borrado la conversación y su contexto.';
     entrada.focus({preventScroll:true});
   });
+
+  // Muestra el saludo y las opciones iniciales del chat.
   function iniciar() {
     agregarMensaje('bot','¡Hola! Soy Resuelve, el asistente de CuidApoyo. Puedo orientarte sobre cuidados diarios, bienestar y recursos de apoyo. Cuéntame qué necesitas o elige una opción. Puedes pedirme después «¿cómo puedo hacerlo?» o «¿qué necesito?».');
     sugerencias(['movilidad','higiene','alimentacion','cuidador','servicios','capacidades'].map(id=>({id,texto:CuidaChat.base.find(i=>i.id===id).titulo})));

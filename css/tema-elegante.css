@@ -1,0 +1,266 @@
+/* Identidad compartida: rosa elegante, superficies luminosas y profundidad suave.
+   Se carga después de los estilos de cada sección para unificar su presentación. */
+:root {
+  --ui-rosa: #b13889;
+  --ui-violeta: #8950c7;
+  --ui-titulo: #392451;
+  --ui-texto: #685578;
+  --ui-panel: #ffffffeb;
+  --ui-suave: #fbf0f8;
+  --ui-borde: #decde8;
+  --ui-gradiente: linear-gradient(115deg, #b13889, #8950c7);
+  --ui-superficie: linear-gradient(145deg, #fffffffa, #fcf5fce8);
+  --ui-sombra: 0 12px 36px #6839790d, inset 0 1px 0 #fff;
+}
+html[data-tema="oscuro"] {
+  --ui-titulo: #f2e5ff;
+  --ui-texto: #cdbbd9;
+  --ui-panel: #2d2239f5;
+  --ui-suave: #38263e;
+  --ui-borde: #674d765e;
+  --ui-superficie: linear-gradient(145deg, #35273f, #291f35);
+  --ui-sombra: 0 12px 36px #10091d26, inset 0 1px 0 #ffffff0c;
+}
+body {
+  background: radial-gradient(ellipse at 0 0, #f9e1f180, transparent 42rem),
+    radial-gradient(ellipse at 100% 28rem, #eae0ff75, transparent 45rem), #fffbfe;
+  color: var(--ui-texto);
+}
+html[data-tema="oscuro"] body {
+  background: radial-gradient(ellipse at 0 0, #8e3f7420, transparent 42rem),
+    radial-gradient(ellipse at 100% 28rem, #754cb322, transparent 45rem), #201827;
+}
+/* Titulares y cabeceras: el rosa se concentra en los acentos y las acciones. */
+.pagina-intro {
+  position: relative;
+  background: radial-gradient(ellipse at 15% 10%, #f5d3e970, transparent 60%),
+    linear-gradient(120deg, #fff7fc, #f4efff);
+  border-bottom: 1px solid var(--ui-borde);
+}
+.pagina-intro h1, .agenda-bienvenida h1, .cp-contenido h1 {
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ui-titulo);
+  letter-spacing: -.045em;
+}
+.pagina-intro h1 span, .encabezado-editorial h2 span,
+.agenda-bienvenida h1 span, .cp-presentacion h1 span {
+  background: var(--ui-gradiente);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+html[data-tema="oscuro"] :is(.pagina-intro h1 span, .encabezado-editorial h2 span, .agenda-bienvenida h1 span, .cp-presentacion h1 span) {
+  background-image: linear-gradient(110deg, #df9cd3, #bc9af0);
+}
+:is(.rotulo, .agenda-rotulo, .etiqueta) { color: #a23b81; }
+html[data-tema="oscuro"] :is(.rotulo, .agenda-rotulo, .etiqueta) { color: #e4aed5; }
+/* Acciones: el mismo acabado del botón de acceso en todas las herramientas. */
+body :is(.boton.rosa, .agenda-boton.principal, .cp-boton.principal),
+.video-filtros button[aria-pressed="true"] {
+  background: var(--ui-gradiente);
+  color: #fff;
+  border: 1px solid #ffffff50;
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 #ffffff40, 0 6px 18px #a1409826;
+}
+body :is(.boton.rosa, .agenda-boton.principal, .cp-boton.principal):hover,
+.video-filtros button[aria-pressed="true"]:hover {
+  background: linear-gradient(115deg, #a32c7d, #7d42bc);
+  color: #fff;
+  box-shadow: inset 0 1px 0 #ffffff40, 0 9px 24px #a1409833;
+}
+body .boton.contorno, body .enlace-secundario {
+  border: 1px solid var(--ui-borde);
+  background: var(--ui-panel);
+  color: var(--ui-titulo);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 #ffffff60;
+}
+body :is(button, a, input, select, textarea, summary):focus-visible {
+  outline: 3px solid #a54a98;
+  outline-offset: 4px;
+}
+html[data-tema="oscuro"] body :is(button, a, input, select, textarea, summary):focus-visible { outline-color: #e8a7d8; }
+/* Inicio: tarjetas independientes, iconos de cristal y bloques con volumen. */
+.servicios-inicio { background: transparent; }
+body .servicios-inicio .servicios-grid { background: transparent; box-shadow: none; gap: 20px; }
+body .servicios-inicio .servicio {
+  border: 1px solid var(--ui-borde);
+  border-radius: 24px;
+  background: var(--ui-superficie);
+  box-shadow: var(--ui-sombra);
+  overflow: hidden;
+}
+body .servicios-inicio .servicio .icono {
+  border: 1px solid #ffffffc9;
+  box-shadow: inset 0 1px 0 #fff, 0 7px 20px #a1409812;
+  border-radius: 18px;
+}
+body .servicios-inicio .servicio h3 { color: var(--ui-titulo); }
+body .servicios-inicio .servicio p { color: var(--ui-texto); }
+body .servicio-acceso { color: var(--ui-rosa); }
+body .guia { background: transparent; }
+body .guia .paso {
+  background: var(--ui-superficie);
+  border: 1px solid var(--ui-borde);
+  border-radius: 22px;
+  box-shadow: var(--ui-sombra);
+}
+body .llamada {
+  border-top: 1px solid var(--ui-borde);
+  border-bottom: 1px solid var(--ui-borde);
+  background: radial-gradient(ellipse at 0 100%, #f5d2e980, transparent 60%),
+    linear-gradient(115deg, #fff5fb, #f0e8fc);
+}
+body .invitacion-panel {
+  background: var(--ui-superficie);
+  border: 1px solid var(--ui-borde);
+  box-shadow: 0 20px 50px #81429418, inset 0 1px 0 #fff;
+}
+body .banda { background: var(--ui-suave); border-block: 1px solid var(--ui-borde); }
+/* Recursos: las opciones desplegables se presentan como paneles luminosos. */
+body .necesidades, body .dudas { background: transparent; }
+body .necesidades-intro {
+  border: 1px solid var(--ui-borde);
+  border-radius: 26px;
+  background: var(--ui-superficie);
+  box-shadow: var(--ui-sombra);
+}
+body .opcion, body .dudas-lista details {
+  border: 1px solid var(--ui-borde);
+  border-radius: 20px;
+  background: var(--ui-superficie);
+  box-shadow: var(--ui-sombra);
+  overflow: hidden;
+}
+body .opcion[open], body .dudas-lista details[open] {
+  border-color: #c293be;
+  box-shadow: 0 10px 30px #a1409812, inset 0 1px 0 #fff;
+}
+body .opcion summary { color: var(--ui-titulo); }
+body .opcion-contenido { color: var(--ui-texto); }
+/* Tutoriales: una superficie por tarjeta y controles con el mismo lenguaje visual. */
+body .video-tarjeta {
+  padding: 10px;
+  border: 1px solid var(--ui-borde);
+  border-radius: 25px;
+  background: var(--ui-superficie);
+  box-shadow: var(--ui-sombra);
+}
+body .video-miniatura { border-radius: 17px; }
+body .video-info { padding: 16px 8px 12px; }
+body .video-info h3 { color: var(--ui-titulo); }
+body .video-filtros button:not([aria-pressed="true"]) {
+  background: var(--ui-panel); border-color: var(--ui-borde); color: var(--ui-texto);
+  box-shadow: inset 0 1px 0 #ffffff70;
+}
+body .video-busqueda input { background: var(--ui-panel); color: var(--ui-titulo); border-color: var(--ui-borde); box-shadow: var(--ui-sombra); }
+body .pagina-siguiente { background: var(--ui-suave); border-block: 1px solid var(--ui-borde); }
+/* Chat: panel de conversación con cabecera luminosa y mensajes diferenciados. */
+body .chat-panel {
+  --chat-superficie: var(--ui-panel);
+  --chat-borde: var(--ui-borde);
+  --chat-texto: var(--ui-titulo);
+  --chat-burbuja: var(--ui-suave);
+  border-radius: 28px;
+  box-shadow: 0 22px 65px #71418a12, inset 0 1px 0 #fff;
+}
+body .chat-cabecera { background: var(--ui-superficie); }
+body .chat-formulario { background: var(--ui-suave); }
+body .chat-opciones button { border-color: var(--ui-borde); background: var(--ui-panel); color: var(--ui-titulo); border-radius: 13px; }
+body .chat-mensaje-bot { background: var(--ui-suave); border: 1px solid var(--ui-borde); }
+body .chat-mensaje-usuario { background: var(--ui-gradiente); color: #fff; border-color: transparent; }
+/* Calendario: conserva los colores de categorías y realza sus paneles de trabajo. */
+body.pagina-agenda {
+  --ag-panel: var(--ui-panel);
+  --ag-borde: var(--ui-borde);
+  --ag-texto: var(--ui-titulo);
+  --ag-suave: var(--ui-texto);
+  --ag-sombra: var(--ui-sombra);
+}
+body .agenda-bienvenida {
+  padding: 26px;
+  margin-bottom: 28px;
+  border: 1px solid var(--ui-borde);
+  border-radius: 26px;
+  background: var(--ui-superficie);
+  box-shadow: var(--ui-sombra);
+}
+body .agenda-lateral > div, body .agenda-mes, body .agenda-estadisticas > div {
+  border-color: var(--ui-borde);
+  background: var(--ui-superficie);
+  box-shadow: var(--ui-sombra);
+}
+body .agenda-lateral .agenda-hoy { background: linear-gradient(145deg, #fae4f2, #efe5fd); }
+body .agenda-mes { border-radius: 24px; overflow: hidden; }
+body .agenda-dialogo { background: var(--ui-panel); border: 1px solid var(--ui-borde); border-radius: 24px; box-shadow: 0 25px 80px #39245130; }
+body .agenda-vistas { background: var(--ui-suave); border: 1px solid var(--ui-borde); }
+/* Mi cuenta: mismas superficies, incluidos los pasos del asistente y los diálogos. */
+body .cp-contenido, body .cp-confirmar {
+  --cp-panel: var(--ui-panel);
+  --cp-fondo: transparent;
+  --cp-suave: var(--ui-suave);
+  --cp-texto: var(--ui-titulo);
+  --cp-secundario: var(--ui-texto);
+  --cp-linea: var(--ui-borde);
+  --cp-rosa: var(--ui-rosa);
+  --cp-acento: #875094;
+}
+body .cp-card, body .cp-principal > .cp-card, body .cp-lateral {
+  background: var(--ui-superficie);
+  border-color: var(--ui-borde);
+  box-shadow: var(--ui-sombra);
+  border-radius: 24px;
+}
+body .cp-destacada { background: linear-gradient(145deg, #fbe5f2, #f1e8fc); }
+body .cp-form-acceso { box-shadow: 0 24px 65px #81429417, inset 0 1px 0 #fff; }
+body .cp-lateral nav a[aria-current="page"] {
+  background: linear-gradient(115deg, #f8e0ef, #eee2fa);
+  color: #823b83;
+}
+body .cp-ayuda-tarjeta, body .cp-nivel-ayuda label, body .cp-recomendaciones-simples > a {
+  background: var(--ui-superficie); border-color: var(--ui-borde); box-shadow: var(--ui-sombra);
+}
+body .cp-ayuda-tarjeta:has(input:checked), body .cp-nivel-ayuda label:has(input:checked) { background: var(--ui-suave); border-color: var(--ui-rosa); }
+/* Estados oscuros: fondos profundos y acentos rosa legibles. */
+html[data-tema="oscuro"] body :is(.pagina-intro, .llamada) {
+  background: radial-gradient(ellipse at 0 100%, #9e467124, transparent 65%), linear-gradient(115deg, #2b1e32, #282039);
+}
+html[data-tema="oscuro"] body :is(.agenda-lateral .agenda-hoy, .cp-destacada) { background: linear-gradient(145deg, #432c43, #30243f); }
+html[data-tema="oscuro"] body .cp-lateral nav a[aria-current="page"] { background: linear-gradient(115deg, #59304e, #45305f); color: #f5d8ef; }
+html[data-tema="oscuro"] body :is(.cp-contenido, .cp-confirmar) { --cp-rosa: #e4a7d1; --cp-acento: #c5a3e7; }
+html[data-tema="oscuro"] body .servicio-acceso { color: #e4a7d1; }
+html[data-tema="oscuro"] body :is(.servicios-inicio .servicio .icono, .invitacion-panel, .opcion[open], .dudas-lista details[open], .chat-panel, .cp-form-acceso) { box-shadow: var(--ui-sombra); border-color: var(--ui-borde); }
+/* Movimiento discreto solo en elementos interactivos; sin desplazamientos en móvil. */
+@media (hover: hover) and (pointer: fine) {
+  body .servicios-inicio .servicio:hover { transform: translateY(-5px); border-color: #c293be; box-shadow: 0 18px 42px #8142941c; }
+  body .video-tarjeta:hover { border-color: #c293be; box-shadow: 0 16px 38px #81429418; }
+  body :is(.opcion summary, .dudas-lista summary):hover { background: var(--ui-suave); }
+}
+@media (max-width: 600px) {
+  body .agenda-bienvenida { padding: 20px; border-radius: 22px; }
+  body .servicios-inicio .servicios-grid { gap: 14px; }
+  body :is(.cp-card, .cp-principal > .cp-card, .cp-lateral) { border-radius: 20px; }
+  body .video-tarjeta { padding: 8px; border-radius: 22px; }
+  body .video-info { padding-inline: 5px; }
+  body .videoteca-acciones { margin-left: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body .servicios-inicio .servicio:hover { transform: none; }
+}
+
+/* Ajustes finales: títulos sin palabras pegadas y navegación cómoda a 320 px. */
+.pagina-intro-videos h1 span::before { content: ' '; white-space: pre; }
+html[data-tema="oscuro"] body .video-filtros button:not([aria-pressed="true"]) {
+  background: var(--ui-panel); color: var(--ui-texto); border-color: var(--ui-borde); box-shadow: inset 0 1px 0 #ffffff0c;
+}
+html[data-tema="oscuro"] body .video-filtros button[aria-pressed="true"] {
+  background: var(--ui-gradiente); color: #fff; border-color: #ffffff40;
+}
+@media (max-width: 380px) {
+  body .agenda-mes-cabecera { flex-direction: column; align-items: stretch; gap: 16px; }
+  body .agenda-mes-cabecera .agenda-navegacion { max-width: none; justify-content: flex-start; }
+  body .agenda-mes-cabecera .agenda-elegir-mes { flex-basis: auto; justify-content: flex-start; }
+  body .agenda-mes-cabecera .agenda-navegacion input { width: 140px; }
+}

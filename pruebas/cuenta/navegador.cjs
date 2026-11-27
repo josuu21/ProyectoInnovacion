@@ -1,9 +1,13 @@
+// Pruebas del espacio personal mediante Chrome y su protocolo DevTools.
+
 /* QA en Chrome instalado. Perfil desechable, servidor loopback y CDP sin paquetes. */
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),{spawn}=require('node:child_process'),assert=require('node:assert/strict');
 const base=path.resolve(__dirname,'../..'),artefactos=path.join(__dirname,'resultados');fs.mkdirSync(artefactos,{recursive:true});
 const perfil=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'cuidapoyo-qa-'));
 let chrome,server,ws;const errores=[];let total=0;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+// Arranca el servidor y Chrome, conecta DevTools y ejecuta las comprobaciones.
 async function main(){
  server=http.createServer((req,res)=>{try{let p=path.resolve(base,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!p.startsWith(base+path.sep))throw 0;const ext=path.extname(p);res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg'})[ext]||'text/plain; charset=utf-8');res.end(fs.readFileSync(p));}catch(_){res.statusCode=404;res.end('No encontrado');}});
  await new Promise(r=>server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+server.address().port;
@@ -18,12 +22,26 @@ async function main(){
  const cdp=(method,params={})=>new Promise((resolve,reject)=>{const id=++seq;pendientes.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});
  const js=async expression=>{const r=await cdp('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result.value;};
  const wait=async expression=>{for(let i=0;i<100;i++){if(await js(expression))return;await sleep(75);}throw Error('Espera agotada: '+expression);};
+
+ // Abre una página de prueba y espera a que termine de cargar.
  async function go(page){await cdp('Page.navigate',{url:origin+'/html/'+page});await wait('document.readyState==="complete"');await sleep(120);}
+
+ // Comprueba que existe el control y simula una pulsación en el navegador.
  async function click(selector){assert(await js(`!!document.querySelector(${JSON.stringify(selector)})`),'No existe '+selector);await js(`document.querySelector(${JSON.stringify(selector)}).click()`);await sleep(80);}
+
+ // Rellena un campo y emite el evento que activa su validación.
  async function fill(name,value,form='form'){await js(`(()=>{const f=document.querySelector(${JSON.stringify(form)}),i=f.elements[${JSON.stringify(name)}];i.value=${JSON.stringify(value)};i.dispatchEvent(new Event('input',{bubbles:true}));})()`);}
+
+ // Envía el formulario de prueba y espera a que se procese.
  async function submit(form){await js(`document.querySelector(${JSON.stringify(form)}).requestSubmit()`);await sleep(130);}
+
+ // Cambia la sección mediante la URL y espera su actualización.
  async function route(hash){await js(`location.hash=${JSON.stringify(hash)}`);await sleep(100);}
+
+ // Ejecuta una comprobación y registra su resultado correcto en el recuento.
  async function test(name,fn){await fn();total++;console.log('OK '+name);}
+
+ // Guarda una captura de la página para revisar visualmente el resultado.
  async function shot(name){const r=await cdp('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});fs.writeFileSync(path.join(artefactos,name+'.png'),Buffer.from(r.data,'base64'));}
  await cdp('Runtime.enable');await cdp('Page.enable');await cdp('Network.enable');await cdp('Network.setBlockedURLs',{urls:['*fonts.googleapis.com*','*fonts.gstatic.com*']});
  await cdp('Emulation.setDeviceMetricsOverride',{width:1440,height:1100,deviceScaleFactor:1,mobile:false});

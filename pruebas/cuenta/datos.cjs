@@ -1,3 +1,5 @@
+// Pruebas de cuentas en memoria: acceso, perfiles, agenda y migraciones.
+
 /* Ejecutar con Node 22+; sin dependencias. Datos sintéticos en memoria. */
 const {readFileSync}=require('node:fs');
 const {resolve}=require('node:path');
@@ -5,12 +7,18 @@ const vm=require('node:vm');
 const assert=require('node:assert/strict');
 const {webcrypto}=require('node:crypto');
 const base=resolve(__dirname,'../..');
+
+// Entorno aislado donde se cargan los módulos para las pruebas de datos.
 const contexto={crypto:webcrypto,TextEncoder,Intl,Date,console};contexto.globalThis=contexto;contexto.window=contexto;
 vm.createContext(contexto);
 for(const f of ['js/cuenta/datos.js','js/calendario/datos.js','js/cuenta/catalogo.js','js/cuenta/ui.js','js/chatbot/conocimiento.js','js/chatbot/motor.js'])vm.runInContext(readFileSync(resolve(base,f),'utf8'),contexto,{filename:f});
 const C=contexto.CuidaCuenta,A=contexto.CuidaAgenda;
+
+// Almacenamiento simulado para comprobar los datos sin modificar cuentas reales.
 const memoria=()=>{const m=new Map();return {getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)};};
 let total=0;
+
+// Ejecuta una comprobación y registra su resultado correcto en el recuento.
 async function test(nombre,fn){await fn();console.log('OK '+nombre);total++;}
 (async()=>{
  const storage=memoria(),session=memoria(),r=C.crearRepositorio(storage,session),clave='Prueba-Segura-123!';

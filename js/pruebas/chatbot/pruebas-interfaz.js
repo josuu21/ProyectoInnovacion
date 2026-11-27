@@ -1,3 +1,5 @@
+// Pruebas del chat: mensajes, controles, accesibilidad y enlaces en el navegador.
+
 /* Integración sobre la página real: registra errores, usa el formulario y los botones. */
 (async function () {
   'use strict';
@@ -13,6 +15,8 @@
   w.addEventListener('unhandledrejection',e=>errores.push(String(e.reason)));
   comprobar('Cargan los tres scripts del chat',w.CuidaChat && w.CuidaConocimiento && d.querySelectorAll('.chat-mensaje-bot').length===1);
   const entrada=d.getElementById('chatEntrada'),form=d.getElementById('chatFormulario');
+
+  // Valida el mensaje, evita envíos simultáneos y solicita la respuesta al motor local.
   async function enviar(texto) {
     entrada.value=texto;
     form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
@@ -76,6 +80,8 @@
   filtro.click();
   comprobar('Conserva los filtros de tutoriales',Array.from(videos.querySelectorAll('.video-tarjeta')).every(t=>t.hidden===(t.dataset.categoria!=='higiene')) && filtro.getAttribute('aria-pressed')==='true');
   comprobar('Recuento de tutoriales coherente',videos.getElementById('videosCantidad').textContent.startsWith(String(videos.querySelectorAll('.video-tarjeta:not([hidden])').length)));
+
+  // Publica los resultados de integración y el estado global de las pruebas.
   window.resultadosInterfaz=registros;
   registros.forEach(r=>{const li=document.createElement('li');li.textContent=(r.ok?'OK · ':'FALLO · ')+r.nombre;if(!r.ok)li.className='fallo';salida.append(li);});
   const fallos=registros.filter(r=>!r.ok);

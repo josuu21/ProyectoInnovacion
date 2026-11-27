@@ -13,8 +13,11 @@
   <script src="../js/chatbot/conocimiento.js?v=20261124-2" defer></script>
   <script src="../js/chatbot/motor.js?v=20261124-2" defer></script>
   <script src="../js/chatbot/interfaz.js?v=20261124-2" defer></script>
-<link rel="stylesheet" href="../css/cuenta.css"><script src="../js/cuenta/integraciones.js" defer></script></head>
-<body>
+<link rel="stylesheet" href="../css/cuenta.css"><script src="../js/cuenta/integraciones.js" defer></script>
+<link rel="stylesheet" href="../css/tema-elegante.css">
+<link rel="stylesheet" href="../css/chatbot-experiencia.css">
+</head>
+<body class="pagina-chatbot">
 <header class="cabecera">
   <a href="../index.html" class="marca"><img src="../img/logo.jpg" alt="Logotipo de CuidApoyo"><span><strong>CuidApoyo</strong></span></a>
   <button class="menu-boton" id="menuBoton" aria-label="Abrir menú" aria-expanded="false">☰</button>
@@ -22,9 +25,23 @@
   <div class="cabecera-controles"><button class="tema-boton" id="temaBoton" type="button" aria-label="Activar modo oscuro" aria-pressed="false"><svg class="tema-luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg><svg class="tema-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button><a class="cabecera-accion" href="mi-cuenta.html">♡ Iniciar sesión</a></div>
 </header>
 <main id="contenido"><section class="pagina-intro"><nav class="migas" aria-label="Ruta de navegación"><a href="../index.html">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">Chat Bot</span></nav><p class="rotulo">A TU LADO, EN CADA PASO</p><h1>Tus dudas merecen<br><span>un espacio propio.</span></h1><p>Saluda a Resuelve y descubre cómo puede ayudarte en tu día a día.</p></section><section class="chat seccion" aria-labelledby="chatTitulo" id="chatbot">
-  <div class="chat-panel">
+  <div class="chat-escenario" id="chatEscenario">
+    <div class="chat-bienvenida" id="chatBienvenida" hidden>
+      <div class="chat-saludo-ilustracion" aria-hidden="true">
+        <span class="chat-orbita"></span><span class="chat-destello chat-destello-uno">✦</span><span class="chat-destello chat-destello-dos">✦</span>
+        <div class="chat-cara">
+          <svg viewBox="0 0 120 120" fill="none"><ellipse cx="34" cy="70" rx="10" ry="6" fill="currentColor" opacity=".2"/><ellipse cx="86" cy="70" rx="10" ry="6" fill="currentColor" opacity=".2"/><path class="chat-ojos" d="M34 53q7-10 14 0m24 0q7-10 14 0" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M41 72q19 25 38 0" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <p class="chat-bienvenida-rotulo">UN POCO DE APOYO, MUY CERCA</p>
+      <h2>Hola, soy <span>Resuelve.</span></h2>
+      <p>Vamos paso a paso. Estoy aquí para orientarte.</p>
+      <button class="boton rosa" id="chatAbrir" type="button">Abrir conversación</button>
+      <span class="chat-bienvenida-progreso" aria-hidden="true"></span>
+    </div>
+    <div class="chat-panel" id="chatPanel">
     <div class="chat-cabecera">
-      <div><h2 id="chatTitulo">Resuelve · Tu espacio de apoyo</h2><p>Cuidados cotidianos, orientación y compañía.</p></div>
+      <div class="chat-identidad"><span class="chat-avatar" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 12q3-4 6 0m4 0q3-4 6 0M10 20q6 7 12 0"/></svg></span><div><h2 id="chatTitulo">Resuelve</h2><p>Tu espacio de apoyo, a tu ritmo.</p></div></div>
       <button type="button" id="chatReiniciar">Nueva conversación</button>
     </div>
     <p class="chat-nota">Orientación general; no sustituye a profesionales sanitarios o sociales. Los mensajes se procesan en tu navegador y se borran al recargar. Evita compartir datos personales.</p>
@@ -41,7 +58,8 @@
     <p id="chatEstado" class="chat-estado" role="status" aria-live="polite"></p>
     <noscript><p class="chat-nota">Activa JavaScript para utilizar el chat o consulta la sección <a href="recursos.html">Recursos</a>.</p></noscript>
   </div>
-</section><section class="pagina-siguiente"><p>Ya puedes explorar orientación sencilla para el día a día.</p><a class="boton contorno" href="recursos.html">Consultar recursos →</a></section></main><footer class="pie">
+  </div>
+</section></main><footer class="pie">
   <div class="pie-principal">
     <div class="pie-marca"><a href="../index.html" class="pie-logo">CuidApoyo</a><p>Porque quien cuida<br><strong>también necesita apoyo.</strong></p><p class="pie-descripcion">Orientación y recursos para acompañarte en el cuidado diario.</p></div>
     <nav class="pie-navegacion" aria-label="Navegación del pie"><h2>Te acompañamos</h2><a href="tutoriales.html">Tutoriales</a><a href="recursos.html">Recursos</a><a href="chatbot.html">Resuelve · Chat Bot</a><a href="calendario.html">Calendario</a><a href="recursos.html#autocuidado">Consejos para cuidarte</a><a href="../index.html#nosotros">Sobre nosotras</a><a href="mi-cuenta.html">Mi cuenta</a></nav>

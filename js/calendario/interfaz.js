@@ -1,3 +1,5 @@
+// Calendario: vistas, formularios, navegación, filtros y copias de la agenda.
+
 /* Vista mensual y tablero diario. Los mensajes y las tareas se insertan como texto. */
 (function () {
   'use strict';
@@ -8,22 +10,38 @@
   const perfilInicial=contexto?.activePerson;
   const almacen=A.crearAlmacen(contexto?window.CuidaCuenta.repositorio.agendaStorage():storage);
   let hoy=A.hoy(),ultimoError='';
-  let documento={version:1,tasks:[]}, mes=hoy.slice(0,7), dia=hoy, vista='mes';
+  let documento={version:1,tasks:[]}, mes=hoy.slice(0,7), dia=hoy, vista='dia';
   let editando=null, baseEdicion=null, focoAnterior=null, confirmacion=null, deshacer=null, arrastrada=null;
   const formato=(fecha,opciones)=>new Intl.DateTimeFormat('es-ES',opciones).format(A.fechaObjeto(fecha));
   const normalizar=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+
+  // Crea un elemento del DOM con su clase y contenido de texto.
   function nodo(tag,clase,texto) {const n=document.createElement(tag);if(clase)n.className=clase;if(texto!==undefined)n.textContent=texto;return n;}
+
+  // Construye un botón preparado para ejecutar la acción correspondiente.
   function boton(texto,clase,accion) {const b=nodo('button',clase,texto);b.type='button';b.addEventListener('click',accion);return b;}
+
+  // Comunica los cambios mediante la región de estado accesible de la agenda.
   function anunciar(texto) {$('agendaEstado').textContent=texto;}
+
+  // Muestra un aviso y ofrece deshacer la acción cuando se proporciona esa opción.
   function aviso(texto,accion) {
     $('avisoTexto').textContent=texto;deshacer=accion||null;$('deshacer').hidden=!accion;$('agendaAviso').hidden=false;anunciar(texto);
   }
+
+  // Conecta el control cerrarAviso con su acción de click.
   $('cerrarAviso').addEventListener('click',()=>{$('agendaAviso').hidden=true;});
+
+  // Conecta el control deshacer con su acción de click.
   $('deshacer').addEventListener('click',()=>{if(deshacer){const accion=deshacer;deshacer=null;accion();}});
+
+  // Prepara una descarga local y libera después la URL temporal utilizada.
   function descargar(contenido,nombre) {
     const url=URL.createObjectURL(new Blob([contenido],{type:'application/json'})), a=nodo('a');a.href=url;a.download=nombre;
     document.body.append(a);a.click();a.remove();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
+
+  // Explica el estado del guardado y ofrece descargar o recuperar los datos dañados.
   function bannerAlmacen() {
     const e=almacen.estado(),banner=$('avisoAlmacen');banner.replaceChildren();banner.hidden=!(e.corrupto||e.temporal);
     if(e.corrupto) {
@@ -36,6 +54,8 @@
     $('estadoGuardado').textContent=e.temporal?'Solo se conserva en esta sesión. Descarga una copia antes de salir.':'Se guarda en este navegador. Descarga una copia para conservarla o llevarla a otro dispositivo.';
   }
   try{documento=almacen.cargar();}catch(e){aviso(e.message);}
+
+  // Comprueba el perfil, guarda el cambio y actualiza la vista o muestra el error.
   function mutar(cambio,mensaje,despues) {
     ultimoError='';
     try{const actual=window.CuidaCuenta?.repositorio.actual();if(actual?.email!==contexto?.email||actual?.activePerson!==perfilInicial)throw new Error('El perfil ha cambiado. Recarga la página para continuar.');documento=almacen.modificar(cambio);renderizar();if(mensaje)aviso(mensaje,despues);return true;}
@@ -44,13 +64,19 @@
   const filtros=()=>({busqueda:$('buscarTareas').value,categoria:$('filtroCategoria').value,estado:$('filtroEstado').value});
   const filtradas=()=>A.filtrar(documento.tasks,filtros());
   const delDia=(fecha,tareas)=>tareas.filter(t=>t.date===fecha);
+
+  // Selecciona la vista y fecha de la agenda, actualiza el contenido y gestiona el foco.
   function cambiarVista(nueva,fecha,foco) {
     if(fecha && A.fechaValida(fecha)){dia=fecha;mes=fecha.slice(0,7);}
     vista=nueva;renderizar();
     if(foco) {if(vista==='dia')$('diaTitulo').focus({preventScroll:true});else if(vista==='atrasadas')$('atrasadasTitulo').focus({preventScroll:true});}
     anunciar(vista==='dia'?'Tareas del '+formato(dia,{dateStyle:'full'}):vista==='mes'?formato(mes+'-01',{month:'long',year:'numeric'}):'Pendientes de días anteriores');
   }
+
+  // Avanza o retrocede un mes y anuncia el periodo que se muestra.
   function irMes(delta) {mes=A.cambiarMes(mes,delta);dia=mes+'-01';vista='mes';renderizar();anunciar(formato(dia,{month:'long',year:'numeric'}));}
+
+  // Actualiza el progreso de hoy, las próximas tareas y el aviso de tareas atrasadas.
   function renderizarLateral() {
     $('hoyTitulo').textContent=formato(hoy,{weekday:'long'});
     $('hoyFecha').textContent=formato(hoy,{day:'numeric',month:'long',year:'numeric'});
@@ -67,6 +93,8 @@
     const atrasadas=documento.tasks.filter(t=>t.date<hoy && t.status!=='hecha').length;
     $('verAtrasadas').hidden=!atrasadas;$('verAtrasadas').textContent=atrasadas+' pendiente'+(atrasadas===1?'':'s')+' de días anteriores';
   }
+
+  // Calcula y muestra el resumen de tareas del mes filtrado.
   function renderizarResumen(tareas) {
     const mensuales=tareas.filter(t=>t.date.startsWith(mes)), pendientes=mensuales.filter(t=>t.status==='pendiente').length, hechas=mensuales.filter(t=>t.status==='hecha').length;
     $('estadisticasMes').replaceChildren();
@@ -74,6 +102,8 @@
       const bloque=nodo('div','agenda-estadistica'),datos=nodo('div');datos.append(nodo('strong','',String(total)),nodo('small','',texto));bloque.append(nodo('span','',icono),datos);$('estadisticasMes').append(bloque);
     });
   }
+
+  // Dibuja las celdas del calendario y conecta la navegación y sus acciones.
   function renderizarMes(tareas) {
     $('mesTitulo').textContent=formato(mes+'-01',{month:'long'});$('mesAno').textContent=mes.slice(0,4);
     $('elegirMes').value=mes;$('mesAnterior').disabled=mes==='1900-01';$('mesSiguiente').disabled=mes==='2099-12';
@@ -103,9 +133,13 @@
       td.append(b);fila.append(td);
     });
   }
+
+  // Actualiza el estado de la interfaz y sincroniza sus controles.
   function cambiarEstado(id,estado) {
     mutar(tareas=>tareas.map(t=>t.id===id?{...t,status:estado,updatedAt:new Date().toISOString()}:t),estado==='hecha'?'Tarea terminada. Un paso menos, ¡bien hecho!':'Tarea movida a «'+A.estados[estado]+'».');
   }
+
+  // Construye la tarjeta de una tarea con sus datos y acciones disponibles.
   function tarjeta(t,mostrarFecha) {
     const card=nodo('article','agenda-tarjeta cat-'+t.category+(t.status==='hecha'?' etiqueta-hecha':''));card.dataset.id=t.id;card.draggable=true;
     const superior=nodo('div','agenda-tarjeta-superior');superior.append(nodo('span','agenda-etiqueta',A.categorias[t.category]));if(t.priority==='alta')superior.append(nodo('span','agenda-importante','! Importante'));card.append(superior);
@@ -126,8 +160,17 @@
     }
     const acciones=nodo('div','agenda-tarjeta-acciones'),estado=nodo('select');estado.setAttribute('aria-label','Estado de '+t.title);
     Object.entries(A.estados).forEach(([valor,titulo])=>{const op=nodo('option','',titulo);op.value=valor;estado.append(op);});estado.value=t.status;
-    estado.addEventListener('change',()=>{cambiarEstado(t.id,estado.value);const restaurar=document.querySelector('[data-id="'+t.id+'"] select');if(restaurar)restaurar.focus({preventScroll:true});});
-    acciones.append(estado,boton('Editar','',()=>abrirTarea(t)),boton('Duplicar','',()=>abrirTarea(t,'duplicar')),boton('Eliminar','',()=>eliminar([t.id])));
+    estado.addEventListener('change',()=>{cambiarEstado(t.id,estado.value);const restaurar=document.querySelector('[data-id="'+t.id+'"] select');if(restaurar){const menu=restaurar.closest('details');if(menu)menu.open=true;restaurar.focus({preventScroll:true});}});
+    // Completar es la acción principal; el resto queda en un menú de opciones.
+    const completar=boton(t.status==='hecha'?'Volver a pendientes':'✓ Marcar como hecha','agenda-completar',()=>{
+      cambiarEstado(t.id,t.status==='hecha'?'pendiente':'hecha');
+      const siguiente=document.querySelector('[data-id="'+t.id+'"] .agenda-completar');
+      if(siguiente)siguiente.focus({preventScroll:true});
+    });
+    const mas=nodo('details','agenda-tarea-mas'),resumen=nodo('summary','','Más opciones'),opciones=nodo('div','agenda-tarea-menu');
+    opciones.append(estado,boton('Duplicar','',()=>abrirTarea(t,'duplicar')),boton('Eliminar','',()=>eliminar([t.id])));
+    mas.append(resumen,opciones);
+    acciones.append(completar,boton('Editar','',()=>abrirTarea(t)),mas);
     card.append(acciones);
     card.addEventListener('dragstart',e=>{
       if(e.target.closest('button,select,input,textarea')){e.preventDefault();return;}
@@ -136,18 +179,22 @@
     card.addEventListener('dragend',()=>{arrastrada=null;card.classList.remove('en-arrastre');document.querySelectorAll('.arrastrando-sobre').forEach(c=>c.classList.remove('arrastrando-sobre'));});
     return card;
   }
+
+  // Distribuye las tareas del día o las atrasadas en el tablero por estados.
   function renderizarDia(tareas) {
     const todas=delDia(dia,documento.tasks),visibles=delDia(dia,tareas),hechas=todas.filter(t=>t.status==='hecha').length;
     $('diaTitulo').textContent=formato(dia,{weekday:'long',day:'numeric',month:'long'});
     $('elegirDia').value=dia;$('diaAnterior').disabled=dia==='1900-01-01';$('diaSiguiente').disabled=dia==='2099-12-31';
-    $('diaResumen').textContent=todas.length?todas.length+' tareas · '+hechas+' hechas · '+(todas.length-hechas)+' por completar':'Tu día está libre. Empieza con una tarea pequeña.';
+    $('diaResumen').textContent=todas.length?todas.length+' tareas · '+hechas+' hechas · '+(todas.length-hechas)+' por completar':'No tienes tareas para este día. Pulsa «Añadir tarea» para empezar.';
     $('tablero').replaceChildren();
     Object.entries(A.estados).forEach(([estado,titulo])=>{
       const columna=nodo('section','agenda-columna');columna.dataset.estado=estado;columna.setAttribute('aria-label',titulo);
-      const tarjetas=visibles.filter(t=>t.status===estado),h=nodo('h3');h.append(nodo('i'),document.createTextNode(titulo),nodo('span','',String(tarjetas.length)));columna.append(h);
+      const tarjetas=visibles.filter(t=>t.status===estado),h=nodo('h3');
+      if(!tarjetas.length && estado!=='pendiente')return;
+      h.append(nodo('i'),document.createTextNode(titulo),nodo('span','',String(tarjetas.length)));columna.append(h);
       tarjetas.forEach(t=>columna.append(tarjeta(t)));
-      if(!tarjetas.length)columna.append(nodo('p','agenda-columna-vacia',estado==='hecha'?'Aquí irán tus pequeños logros.':estado==='curso'?'Una cosa cada vez.':'Nada por aquí. Respira.'));
-      columna.append(boton('+ Añadir tarea','agenda-columna-anadir',()=>abrirTarea(null,null,{status:estado})));
+      if(!tarjetas.length)columna.append(nodo('p','agenda-columna-vacia',estado==='hecha'?'Aquí irán tus pequeños logros.':estado==='curso'?'Una cosa cada vez.':'No hay tareas pendientes.'));
+
       columna.addEventListener('dragover',e=>{if(arrastrada){e.preventDefault();e.dataTransfer.dropEffect='move';columna.classList.add('arrastrando-sobre');}});
       columna.addEventListener('dragleave',e=>{if(!columna.contains(e.relatedTarget))columna.classList.remove('arrastrando-sobre');});
       columna.addEventListener('drop',e=>{e.preventDefault();const id=arrastrada;arrastrada=null;columna.classList.remove('arrastrando-sobre');if(id&&documento.tasks.some(t=>t.id===id))cambiarEstado(id,estado);});
@@ -155,9 +202,12 @@
     });
     $('limpiarHechas').hidden=!hechas;
   }
+
+  // Actualiza las vistas, los contadores y los avisos de la agenda.
   function renderizar() {
     const tareas=filtradas(),f=filtros();
     $('panelMes').hidden=vista!=='mes';$('panelDia').hidden=vista!=='dia';$('panelAtrasadas').hidden=vista!=='atrasadas';
+    $('estadisticasMes').hidden=vista!=='mes';
     $('vistaMes').setAttribute('aria-pressed',String(vista==='mes'));$('vistaDia').setAttribute('aria-pressed',String(vista==='dia'));
     renderizarLateral();renderizarResumen(tareas);
     if(vista==='mes')renderizarMes(tareas);
@@ -169,16 +219,29 @@
     }
     const activos=Boolean(f.busqueda||f.categoria||f.estado);
     $('limpiarFiltros').hidden=!activos;
+    // Mantiene visibles los filtros activos para que ninguna tarea parezca desaparecer.
+    if($('filtrosIndicador'))$('filtrosIndicador').hidden=!activos;
+    if(activos && $('opcionesFiltros'))$('opcionesFiltros').open=true;
     const cantidad=(vista==='dia'?tareas.filter(t=>t.date===dia):vista==='mes'?tareas.filter(t=>t.date.startsWith(mes)):tareas.filter(t=>t.date<hoy&&t.status!=='hecha')).length;
     $('filtrosResumen').textContent=activos?cantidad+' tareas coinciden con los filtros.':'';
     bannerAlmacen();
   }
+
+  // Prepara el diálogo y conserva la acción que se ejecutará al aceptar.
   function confirmar(titulo,texto,accion,etiqueta) {
     confirmacion=accion;$('confirmarTitulo').textContent=titulo;$('confirmarTexto').textContent=texto;$('aceptarConfirmacion').textContent=etiqueta||'Confirmar';$('dialogoConfirmar').showModal();
   }
+
+  // Conecta el control cancelarConfirmacion con su acción de click.
   $('cancelarConfirmacion').addEventListener('click',()=>{$('dialogoConfirmar').close();confirmacion=null;});
+
+  // Conecta el control dialogoConfirmar con su acción de cancel.
   $('dialogoConfirmar').addEventListener('cancel',()=>{confirmacion=null;});
+
+  // Conecta el control aceptarConfirmacion con su acción de click.
   $('aceptarConfirmacion').addEventListener('click',()=>{const accion=confirmacion;confirmacion=null;$('dialogoConfirmar').close();if(accion)accion();});
+
+  // Retira las tareas seleccionadas y prepara la posibilidad de deshacer el borrado.
   function eliminar(ids) {
     confirmar(ids.length===1?'¿Eliminar esta tarea?':'¿Retirar las tareas hechas?',ids.length===1?'Se elimina solo esta tarea, aunque forme parte de una repetición. Podrás deshacerlo desde el aviso.':'Se retirarán '+ids.length+' tareas hechas de este día. Podrás deshacerlo desde el aviso.',()=>{
       let retiradas=[];
@@ -186,6 +249,8 @@
         ids.length===1?'Tarea eliminada.':'Tareas retiradas.',()=>mutar(tareas=>tareas.concat(retiradas.filter(t=>!tareas.some(x=>x.id===t.id))),'Eliminación deshecha.'));
     },'Eliminar');
   }
+
+  // Rellena el formulario para crear, editar o duplicar una tarea y abre el diálogo.
   function abrirTarea(tarea,modo,predefinidos) {
     focoAnterior=document.activeElement;editando=tarea&&modo!=='duplicar'?tarea.id:null;baseEdicion=editando?tarea.updatedAt:null;
     const t=tarea||{title:'',date:dia,time:'',category:'cuidados',priority:'normal',status:'pendiente',assignee:'',notes:'',checklist:[],...(predefinidos||{})};
@@ -194,11 +259,21 @@
     $('tareaCategoria').value=t.category;$('tareaPrioridad').value=t.priority;$('tareaEstado').value=modo==='duplicar'?'pendiente':t.status;
     $('tareaResponsable').value=t.assignee;$('tareaNotas').value=t.notes;$('tareaPasos').value=t.checklist.map(p=>p.text).join('\n');
     $('repeticionCampos').hidden=Boolean(editando);$('cantidadCampo').hidden=true;$('notaSerie').hidden=!(editando&&t.seriesId);$('errorTarea').textContent='';
+    // Al editar, muestra los detalles que la tarea ya tenía guardados.
+    if($('tareaDetalles'))$('tareaDetalles').open=Boolean(t.notes||t.assignee||t.checklist.length||t.priority==='alta'||t.seriesId||t.status==='curso');
     $('dialogoTarea').showModal();$('tareaTitulo').focus();
   }
+
+  // Cierra el formulario y devuelve el foco al control que lo abrió.
   function cerrarTarea() {$('dialogoTarea').close();if(focoAnterior&&focoAnterior.isConnected)focoAnterior.focus({preventScroll:true});else $('nuevaTarea').focus({preventScroll:true});}
+
+  // Conecta el control cerrarTarea con su acción de click.
   $('cerrarTarea').addEventListener('click',cerrarTarea);$('cancelarTarea').addEventListener('click',cerrarTarea);
+
+  // Conecta el control tareaRepetir con su acción de change.
   $('tareaRepetir').addEventListener('change',()=>{$('cantidadCampo').hidden=$('tareaRepetir').value==='ninguna';$('tareaCantidad').value=$('tareaRepetir').value==='semanal'?4:7;});
+
+  // Valida y guarda la tarea o sus repeticiones; detecta cambios realizados desde otra pestaña.
   $('formTarea').addEventListener('submit',e=>{
     e.preventDefault();$('errorTarea').textContent='';
     try {
@@ -231,22 +306,52 @@
       else $('errorTarea').textContent=ultimoError||'No se ha podido guardar. Tus cambios siguen en este formulario.';
     }catch(error){$('errorTarea').textContent=error.message;}
   });
+
+  // Abre el formulario para crear una tarea.
   $('nuevaTarea').addEventListener('click',()=>abrirTarea());
+
+  // Conecta el control vistaMes con su acción de click.
   $('vistaMes').addEventListener('click',()=>cambiarVista('mes'));$('vistaDia').addEventListener('click',()=>cambiarVista('dia',dia,true));
+
+  // Conecta el control volverMes con su acción de click.
   $('volverMes').addEventListener('click',()=>cambiarVista('mes'));$('atrasadasVolver').addEventListener('click',()=>cambiarVista('mes'));
+
+  // Conecta el control mesAnterior con su acción de click.
   $('mesAnterior').addEventListener('click',()=>irMes(-1));$('mesSiguiente').addEventListener('click',()=>irMes(1));
+
+  // Conecta el control mesHoy con su acción de click.
   $('mesHoy').addEventListener('click',()=>cambiarVista('mes',hoy));$('irHoy').addEventListener('click',()=>cambiarVista('dia',hoy,true));
+
+  // Conecta el control diaAnterior con su acción de click.
   $('diaAnterior').addEventListener('click',()=>cambiarVista('dia',A.sumarDias(dia,-1),true));$('diaSiguiente').addEventListener('click',()=>cambiarVista('dia',A.sumarDias(dia,1),true));
+
+  // Conecta el control elegirMes con su acción de change.
   $('elegirMes').addEventListener('change',e=>{if(A.fechaValida(e.target.value+'-01'))cambiarVista('mes',e.target.value+'-01');});
+
+  // Conecta el control elegirDia con su acción de change.
   $('elegirDia').addEventListener('change',e=>{if(A.fechaValida(e.target.value))cambiarVista('dia',e.target.value,true);});
   ['buscarTareas','filtroCategoria','filtroEstado'].forEach(id=>$(id).addEventListener(id==='buscarTareas'?'input':'change',renderizar));
+
+  // Restablece los filtros para mostrar todas las tareas.
   $('limpiarFiltros').addEventListener('click',()=>{$('buscarTareas').value='';$('filtroCategoria').value='';$('filtroEstado').value='';renderizar();$('buscarTareas').focus();});
+
+  // Conecta el control verAtrasadas con su acción de click.
   $('verAtrasadas').addEventListener('click',()=>cambiarVista('atrasadas',null,true));
+
+  // Conecta el control limpiarHechas con su acción de click.
   $('limpiarHechas').addEventListener('click',()=>eliminar(documento.tasks.filter(t=>t.date===dia&&t.status==='hecha').map(t=>t.id)));
+
+  // Valores iniciales de las tareas creadas desde los accesos rápidos.
   const plantillas={paseo:{title:'Paseo y compañía',category:'cuidados'},comida:{title:'Preparar las comidas',category:'hogar'},cita:{title:'Una cita o visita',category:'citas'},pausa:{title:'Un momento para mí',category:'personal',notes:'Un pequeño descanso también es importante.'}};
   document.querySelectorAll('[data-plantilla]').forEach(b=>b.addEventListener('click',()=>abrirTarea(null,null,plantillas[b.dataset.plantilla])));
+
+  // Lee los datos actuales y descarga una copia JSON de la agenda.
   $('exportar').addEventListener('click',()=>{try{documento=almacen.cargar();descargar(JSON.stringify({...documento,exportedAt:new Date().toISOString()},null,2),'cuidapoyo-calendario-'+hoy+'.json');aviso('Copia descargada. Guárdala en un lugar de confianza.');}catch(e){aviso(e.message);}});
+
+  // Conecta el control importar con su acción de click.
   $('importar').addEventListener('click',()=>{$('archivoImportar').value='';$('archivoImportar').click();});
+
+  // Valida la copia y pide confirmación antes de añadir tareas sin duplicar las existentes.
   $('archivoImportar').addEventListener('change',async e=>{
     const archivo=e.target.files[0];if(!archivo)return;
     try{

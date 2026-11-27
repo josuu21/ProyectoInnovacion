@@ -1,3 +1,5 @@
+// Cuenta: perfiles, acceso local, persistencia y exportación de datos.
+
 /* Repositorio local. Sustituir esta capa por una API autenticada al añadir PHP.
    No aporta aislamiento de seguridad ante alguien con acceso al navegador. */
 (function (raiz) {
@@ -24,6 +26,8 @@
   const texto = (v,max=400) => typeof v === 'string' ? v.trim().slice(0,max) : '';
   const emailValido = v => typeof v==='string' && v.length<=254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   const fuerza = v => Math.min(4, (v.length>=10?1:0)+(v.length>=14?1:0)+(/[a-z]/.test(v)&&/[A-Z]/.test(v)?1:0)+(/\d/.test(v)&&/[^\w\s]/.test(v)?1:0));
+
+  // Normaliza el perfil y valida la edad, las necesidades y los datos de organización.
   function persona(datos={}) {
     const needs = {};
     categorias.forEach(c=>{if (frecuencias.includes(datos.needs?.[c.id])) needs[c.id]=datos.needs[c.id];});
@@ -35,6 +39,8 @@
       organization:{schedule:texto(datos.organization?.schedule),daily:texto(datos.organization?.daily),weekly:texto(datos.organization?.weekly),rest:texto(datos.organization?.rest),goals:texto(datos.organization?.goals),reminders:texto(datos.organization?.reminders,60)},
       agenda:datos.agenda||{version:1,tasks:[]}, tracking:datos.tracking||{}, favorites:datos.favorites||[], consulted:datos.consulted||[], watched:datos.watched||[]};
   }
+
+  // Adapta las cuentas antiguas al modelo actual conservando los datos existentes.
   function migrar(cuenta) {
     if (!cuenta || typeof cuenta!=='object' || !/^[a-f0-9]{64}$/i.test(cuenta.hash||'') || typeof cuenta.salt!=='string') throw new Error('Hay cuentas locales que no se pueden leer. No se han sobrescrito.');
     if (cuenta.version===2) {
@@ -47,13 +53,19 @@
     const people=p?[persona({...p,id:'perfil-anterior',needs,organization:{goals:p.goal}})]:[];
     return {version:2,name:texto(cuenta.name,60)||'Cuidador/a',salt:cuenta.salt,hash:cuenta.hash,people,activePerson:people[0]?.id||null,caregiver:{},wellbeing:{},chatConsent:false,setupDone:Boolean(p),draft:null};
   }
+
+  // Deriva una huella de la contraseña con PBKDF2 y una sal, sin guardar el texto original.
   async function derivar(password,salt) {
     if (!raiz.crypto?.subtle) throw new Error('Abre CuidApoyo con Live Server (localhost) o HTTPS para usar las contraseñas.');
     const key=await raiz.crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);
     const bits=await raiz.crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:210000,hash:'SHA-256'},key,256);
     return Array.from(new Uint8Array(bits),b=>b.toString(16).padStart(2,'0')).join('');
   }
+
+  // Agrupa las operaciones de cuentas locales, sesión y perfiles de personas cuidadas.
   function crearRepositorio(storage,session) {
+
+    // Lee las cuentas y detecta permisos bloqueados o datos dañados.
     function leer() {
       let raw;
       try {raw=storage.getItem(CLAVE);} catch (_) {throw new Error('El navegador bloquea el almacenamiento. Actívalo para guardar tu cuenta local.');}
@@ -61,17 +73,27 @@
       try {const datos=JSON.parse(raw);if (!datos||typeof datos!=='object'||Array.isArray(datos)) throw 0;return datos;}
       catch (_) {throw new Error('No se pueden leer las cuentas guardadas. No se han sobrescrito los datos originales.');}
     }
+
+    // Guarda los datos y comunica los errores que impidan confirmar la escritura.
     function guardar(datos) {
       try {storage.setItem(CLAVE,JSON.stringify(datos));}
       catch (_) {throw new Error('No se ha guardado el cambio. Comprueba el espacio y los permisos de almacenamiento del navegador.');}
     }
+
+    // Consulta el correo asociado a la sesión del navegador.
     function sesion() {try {return session.getItem(SESION);}catch(_){return null;}}
+
+    // Recupera la cuenta de la sesión y adapta sus datos al formato actual.
     function actual() {const email=sesion(),datos=leer();return email&&Object.hasOwn(datos,email)?{email,...migrar(datos[email])}:null;}
+
+    // Aplica una modificación a la cuenta autenticada y guarda el resultado.
     function cambiar(mutacion) {
       const email=sesion(),datos=leer();
       if (!email||!Object.hasOwn(datos,email)) throw new Error('Inicia sesión para continuar.');
       const cuenta=migrar(datos[email]);mutacion(cuenta);datos[email]=cuenta;guardar(datos);return {email,...copiar(cuenta)};
     }
+
+    // Valida los datos, crea la cuenta local y abre su sesión.
     async function registro(name,email,password) {
       name=texto(name,60);email=email.trim().toLowerCase();
       if (!name||!emailValido(email)) throw new Error('Escribe tu nombre y un correo válido.');
@@ -82,30 +104,50 @@
       Object.defineProperty(datos,email,{value:{version:2,name,salt,hash,people:[],activePerson:null,caregiver:{},wellbeing:{},chatConsent:false,setupDone:false,draft:null},enumerable:true,configurable:true,writable:true});
       guardar(datos);try {session.setItem(SESION,email);}catch(_){throw new Error('Cuenta creada, pero la sesión está bloqueada. Permite el almacenamiento de sesión e inicia sesión.');}return actual();
     }
+
+    // Comprueba las credenciales, actualiza la cuenta y establece la sesión.
     async function login(email,password) {
       email=email.trim().toLowerCase();const datos=leer(),cuenta=Object.hasOwn(datos,email)?migrar(datos[email]):null;
       if (!cuenta||await derivar(password,cuenta.salt)!==cuenta.hash) throw new Error('El correo o la contraseña no coinciden. Revisa ambos campos.');
       datos[email]=cuenta;guardar(datos);
       try {session.setItem(SESION,email);} catch(_){throw new Error('No se puede abrir una sesión. Revisa los permisos del navegador.');}return actual();
     }
+
+    // Elimina la referencia de la sesión actual.
     function salir() {session.removeItem(SESION);}
+
+    // Busca la persona seleccionada dentro de la cuenta actual.
     function activa() {const u=actual();return u?.people.find(p=>p.id===u.activePerson)||null;}
+
+    // Localiza una persona de la cuenta y aplica la modificación solicitada.
     function cambiarPersona(id,mutacion) {return cambiar(u=>{const p=u.people.find(p=>p.id===id);if(!p)throw new Error('Esta persona ya no está en tu cuenta.');mutacion(p,u);});}
+
+    // Crea o actualiza una persona conservando su agenda, seguimiento y contenidos guardados.
     function guardarPersona(datos,cuidador) {
       const p=persona(datos);
       return cambiar(u=>{const i=u.people.findIndex(x=>x.id===p.id);if(i<0)u.people.push(p);else u.people[i]={...u.people[i],...p,agenda:u.people[i].agenda,tracking:u.people[i].tracking,favorites:u.people[i].favorites,consulted:u.people[i].consulted,watched:u.people[i].watched};u.activePerson=p.id;u.setupDone=true;u.draft=null;if(cuidador)u.caregiver=cuidador;});
     }
+
+    // Comprueba que la persona pertenece a la cuenta y la establece como perfil activo.
     function seleccionar(id) {return cambiar(u=>{if(!u.people.some(p=>p.id===id))throw new Error('Elige una persona de tu cuenta.');u.activePerson=id;});}
+
+    // Elimina la persona y elige otro perfil activo si hace falta.
     function eliminarPersona(id) {return cambiar(u=>{u.people=u.people.filter(p=>p.id!==id);if(u.activePerson===id)u.activePerson=u.people[0]?.id||null;});}
+
+    // Adapta la agenda del perfil activo a la interfaz de almacenamiento del calendario.
     function agendaStorage() {
       const u=actual(),pid=u?.activePerson;
       if(!u||!pid) return storage;
       // El calendario usa su validador y su API habituales sobre el mismo documento.
+
+      // Comprueba el contexto requerido antes de continuar la operación.
       function comprobar(){const a=actual();if(!a||a.email!==u.email||a.activePerson!==pid)throw new Error('El perfil ha cambiado. Recarga el calendario antes de continuar.');return a;}
       return {estricto:true,getItem(){const a=comprobar(),p=a.people.find(p=>p.id===pid);return JSON.stringify(p.agenda);},
         setItem(key,raw){comprobar();const doc=raiz.CuidaAgenda.validarDocumento(JSON.parse(raw));cambiarPersona(pid,p=>{p.agenda=doc;});},
         removeItem(){comprobar();cambiarPersona(pid,p=>{p.agenda={version:1,tasks:[]};});}};
     }
+
+    // Valida la contraseña y actualiza nombre y correo manteniendo los perfiles.
     async function editarCuenta(name,email,password) {
       const u=actual();if(!u)throw new Error('Inicia sesión.');email=email.trim().toLowerCase();name=texto(name,60);
       if(!name||!emailValido(email))throw new Error('Escribe tu nombre y un correo válido.');
@@ -114,15 +156,21 @@
       const cuenta=migrar(datos[u.email]);cuenta.name=name;delete datos[u.email];Object.defineProperty(datos,email,{value:cuenta,enumerable:true,writable:true,configurable:true});
       guardar(datos);try{session.setItem(SESION,email);}catch(_){salir();throw new Error('Datos guardados. Vuelve a iniciar sesión con tu nuevo correo.');}
     }
+
+    // Verifica la contraseña actual y guarda la nueva huella con una sal renovada.
     async function cambiarClave(actualClave,nueva) {
       const u=actual();if(!u||await derivar(actualClave,u.salt)!==u.hash)throw new Error('La contraseña actual no coincide.');
       if(nueva.length<10||nueva.length>128)throw new Error('La nueva contraseña debe tener entre 10 y 128 caracteres.');
       const salt=uid(),hash=await derivar(nueva,salt);cambiar(c=>{c.salt=salt;c.hash=hash;});
     }
+
+    // Verifica la contraseña antes de borrar la cuenta y cerrar su sesión.
     async function eliminarCuenta(password) {
       const u=actual();if(!u||await derivar(password,u.salt)!==u.hash)throw new Error('La contraseña no coincide.');
       const datos=leer();delete datos[u.email];guardar(datos);salir();
     }
+
+    // Prepara una copia de la cuenta que excluye la huella y la sal de la contraseña.
     function exportar() {const u=actual();if(!u)throw new Error('Inicia sesión.');const {hash,salt,...datos}=u;return {app:'CuidApoyo',version:2,exportedAt:new Date().toISOString(),...datos};}
     return {actual,activa,cambiar,cambiarPersona,registro,login,salir,guardarPersona,seleccionar,eliminarPersona,agendaStorage,editarCuenta,cambiarClave,eliminarCuenta,exportar};
   }

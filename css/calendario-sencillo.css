@@ -1,0 +1,149 @@
+/* Agenda sencilla: una tarea principal por pantalla y opciones al necesitarlas. */
+body.pagina-agenda { font-size: 18px; }
+.pagina-agenda .agenda-contenido { max-width: 1240px; padding-top: 28px; }
+body .agenda-bienvenida { padding: 24px 28px; margin-bottom: 24px; }
+body .agenda-bienvenida h1 { font-size: clamp(28px, 3.2vw, 40px); }
+body .agenda-bienvenida > div > p:last-child { font-size: 1.0625rem; }
+.pagina-agenda .agenda-dibujo { display: none; }
+.pagina-agenda .agenda-distribucion { display: flex; flex-direction: column; gap: 24px; }
+.pagina-agenda .agenda-principal { order: 0; width: 100%; }
+.pagina-agenda .agenda-herramientas { order: 1; width: 100%; }
+.pagina-agenda .agenda-barra-superior { gap: 18px; margin-bottom: 16px; }
+.pagina-agenda .agenda-vistas { padding: 5px; }
+.pagina-agenda .agenda-vistas button { min-height: 50px; padding: 12px 24px; font-size: 1.0625rem; }
+.pagina-agenda .agenda-vistas button[aria-pressed="true"] { background: var(--ui-gradiente); color: #fff; box-shadow: 0 4px 12px #a1409826; }
+.pagina-agenda .agenda-boton { min-height: 52px; font-size: 1.0625rem; padding: 13px 22px; }
+.pagina-agenda #nuevaTarea { font-size: 1.125rem; }
+/* Los desplegables son controles grandes, con una indicación clara de apertura. */
+.agenda-filtros-panel, .agenda-herramientas, .agenda-detalles-tarea {
+  border: 1px solid var(--ui-borde); border-radius: 18px; background: var(--ui-panel);
+}
+.agenda-filtros-panel { margin-bottom: 20px; }
+:is(.agenda-filtros-panel, .agenda-herramientas, .agenda-detalles-tarea) > summary {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; min-height: 54px;
+  padding: 15px 20px; color: var(--ui-titulo); font-size: 1rem; font-weight: 700; cursor: pointer; list-style: none;
+}
+:is(.agenda-filtros-panel, .agenda-herramientas, .agenda-detalles-tarea) > summary::-webkit-details-marker { display: none; }
+:is(.agenda-filtros-panel, .agenda-herramientas, .agenda-detalles-tarea) > summary::after { content: '+'; margin-left: auto; font-size: 1.5rem; font-weight: 400; line-height: 1; }
+:is(.agenda-filtros-panel, .agenda-herramientas, .agenda-detalles-tarea)[open] > summary::after { content: '−'; }
+:is(.agenda-herramientas, .agenda-detalles-tarea) > summary span { font-size: .875rem; font-weight: 400; color: var(--ui-texto); }
+.pagina-agenda .agenda-filtros { padding: 4px 20px 20px; margin: 0; gap: 14px; align-items: end; }
+.pagina-agenda .agenda-filtros > label { flex: 1 1 170px; }
+.pagina-agenda .agenda-filtros > label:first-child { flex-basis: 100%; }
+.agenda-filtro-etiqueta { display: block; margin-bottom: 7px; font-size: 1rem; font-weight: 700; }
+.pagina-agenda .agenda-filtros :is(input, select) { min-height: 50px; font-size: 1rem; }
+#filtrosIndicador { padding: 4px 9px; border-radius: 8px; background: var(--ui-suave); color: var(--ag-acento); font-size: .875rem; }
+/* Un resumen pequeño solo acompaña al calendario mensual. */
+.pagina-agenda .agenda-estadisticas { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-bottom: 20px; }
+body .agenda-estadisticas > .agenda-estadistica { padding: 0; border: 0; box-shadow: none; background: none; gap: 8px; }
+.pagina-agenda .agenda-estadistica > span { display: none; }
+.pagina-agenda .agenda-estadistica > div { display: flex; align-items: baseline; gap: 7px; }
+.pagina-agenda .agenda-estadistica strong { font-size: 1.25rem; }
+.pagina-agenda .agenda-estadistica small { font-size: .9375rem; }
+/* Mi día: una lista amplia, agrupada por estado y sin columnas vacías. */
+.pagina-agenda .agenda-dia { padding: 28px; background: var(--ui-superficie); }
+.pagina-agenda .agenda-dia-cabecera h2 { font-size: clamp(24px, 2.4vw, 30px); }
+.pagina-agenda .agenda-dia-cabecera p { font-size: 1.0625rem; line-height: 1.65; max-width: 55ch; }
+.pagina-agenda .agenda-enlace { font-size: 1rem; }
+.pagina-agenda .agenda-navegacion { max-width: none; gap: 8px; }
+.pagina-agenda .agenda-navegacion > button { min-width: 48px; min-height: 48px; }
+.pagina-agenda .agenda-navegacion input { font-size: 1rem; min-height: 48px; max-width: 180px; }
+.pagina-agenda .agenda-tablero { display: flex; flex-direction: column; gap: 24px; margin-top: 24px; }
+.pagina-agenda .agenda-columna { background: none; border: 0; border-radius: 0; padding: 0; min-height: 0; }
+.pagina-agenda .agenda-columna h3 { font-size: 1.125rem; padding: 12px 16px; margin-bottom: 14px; border-radius: 12px; background: #f1e7fc; color: #68428a; }
+.pagina-agenda .agenda-columna[data-estado="curso"] h3 { background: #fff1cf; color: #7a5b1c; }
+.pagina-agenda .agenda-columna[data-estado="hecha"] h3 { background: #e0f3e9; color: #2d7057; }
+.pagina-agenda .agenda-columna h3 > span { font-size: 1rem; min-width: 28px; text-align: center; }
+.pagina-agenda .agenda-columna-vacia { padding: 30px 20px; font-size: 1.125rem; background: var(--ui-panel); }
+.pagina-agenda .agenda-tarjeta { padding: 22px; border-left-width: 5px; border-radius: 18px; margin-bottom: 14px; }
+.pagina-agenda .agenda-tarjeta h4 { font-size: 1.25rem; margin-block: 12px 8px; }
+.pagina-agenda .agenda-tarjeta p, .pagina-agenda .agenda-tarjeta .agenda-hora { font-size: 1.0625rem; }
+.pagina-agenda .agenda-etiqueta, .pagina-agenda .agenda-importante { font-size: .9375rem; }
+.pagina-agenda .agenda-checklist label { font-size: 1.0625rem; min-height: 44px; gap: 12px; }
+.pagina-agenda .agenda-checklist input { width: 22px; height: 22px; }
+.pagina-agenda .agenda-tarjeta-acciones { gap: 12px 18px; align-items: center; }
+.pagina-agenda .agenda-tarjeta-acciones button { min-height: 46px; font-size: 1rem; padding: 10px; }
+.pagina-agenda .agenda-tarjeta-acciones .agenda-completar { padding: 11px 16px; border: 1px solid #b7dcc9; border-radius: 12px; color: #2d7057; background: #e6f4ec; font-weight: 800; text-decoration: none; }
+.agenda-tarea-mas { margin-left: auto; }
+.agenda-tarea-mas > summary { min-height: 46px; padding: 11px 6px; cursor: pointer; font-size: 1rem; color: var(--ag-acento); }
+.agenda-tarea-menu { display: flex; flex-wrap: wrap; gap: 12px; padding-top: 8px; }
+.pagina-agenda .agenda-tarea-menu select { min-height: 48px; font-size: 1rem; }
+/* Calendario: días neutros y colores en las tareas, sin colorear cada día de la semana. */
+.pagina-agenda .agenda-mes-cabecera h2 { font-size: clamp(26px, 3vw, 36px); }
+.pagina-agenda .agenda-mes-instruccion { font-size: 1rem; }
+.pagina-agenda .agenda-tabla th { font-size: 1rem; padding-block: 10px; }
+body.pagina-agenda .agenda-tabla td .agenda-dia-celda { background: #faf7fd; border: 1px solid #e6daee; color: #483358; min-height: 120px; padding: 10px; }
+body.pagina-agenda .agenda-tabla td .agenda-dia-celda.es-hoy { border: 2px solid #af448b; background: #f9e5f2; padding: 9px; }
+body.pagina-agenda .agenda-dia-celda.fuera-mes { opacity: .5; }
+.pagina-agenda .agenda-dia-numero { font-size: 1.125rem; }
+.pagina-agenda .agenda-dia-numero em { font-size: .75rem; }
+.pagina-agenda .agenda-muestra { font-size: .875rem; padding: 4px 6px; background: #eee3fa; border-radius: 5px; }
+.pagina-agenda .agenda-muestra.cat-citas { background: #f9dfee; }
+.pagina-agenda .agenda-muestra.cat-hogar { background: #e1f2e9; }
+.pagina-agenda .agenda-muestra.cat-personal { background: #fff1ce; }
+.pagina-agenda .agenda-dia-cantidad { font-size: .875rem; }
+.pagina-agenda .agenda-leyenda { font-size: .9375rem; gap: 12px; }
+.pagina-agenda .agenda-leyenda span { padding: 7px 10px; border: 1px solid var(--ui-borde); border-radius: 10px; background: var(--ui-panel); }
+.pagina-agenda .agenda-leyenda i { width: 10px; height: 10px; }
+/* Extras disponibles sin competir con las tareas. */
+.pagina-agenda .agenda-herramientas .agenda-lateral { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 20px 20px; }
+.pagina-agenda .agenda-lateral > div { padding: 20px; }
+.pagina-agenda .agenda-lateral :is(p, button, li) { font-size: 1rem; }
+.pagina-agenda .agenda-lateral h2 { font-size: 1.25rem; }
+.pagina-agenda .agenda-proximas ul { display: block; }
+.pagina-agenda .agenda-herramientas .cuenta-contexto { margin: 0 20px 20px; border-radius: 12px; font-size: .9375rem; line-height: 1.7; }
+.pagina-agenda .agenda-herramientas .agenda-copia { grid-column: auto; }
+.pagina-agenda .agenda-pie-nota { font-size: 1rem; }
+/* Formulario breve: lo esencial primero, las opciones avanzadas después. */
+.pagina-agenda .agenda-dialogo { width: min(620px, calc(100% - 28px)); padding: 28px; }
+.pagina-agenda .agenda-dialogo label { font-size: 1.0625rem; }
+.pagina-agenda .agenda-dialogo label :is(input, select, textarea) { font-size: 1.0625rem; min-height: 50px; }
+.pagina-agenda .agenda-dialogo .agenda-opcional { font-size: .875rem; }
+.pagina-agenda .agenda-detalles-tarea { margin-block: 6px 20px; }
+.pagina-agenda .agenda-detalles-tarea[open] { padding: 0 16px 16px; }
+.pagina-agenda .agenda-detalles-tarea[open] > summary { padding-inline: 0; margin-bottom: 12px; }
+.pagina-agenda .agenda-ayuda, .pagina-agenda .agenda-error, .pagina-agenda .agenda-aviso { font-size: 1rem; }
+/* Contraste conservado en las variantes de color del modo oscuro. */
+html[data-tema="oscuro"] .pagina-agenda .agenda-columna h3 { background: #443150; color: #e8cef7; }
+html[data-tema="oscuro"] .pagina-agenda .agenda-columna[data-estado="curso"] h3 { background: #4b3e27; color: #f5dfa1; }
+html[data-tema="oscuro"] .pagina-agenda .agenda-columna[data-estado="hecha"] h3 { background: #28483c; color: #bde9d2; }
+html[data-tema="oscuro"] body.pagina-agenda .agenda-tabla td .agenda-dia-celda { background: #30243c; border-color: #644a735e; color: #eadbf5; }
+html[data-tema="oscuro"] body.pagina-agenda .agenda-tabla td .agenda-dia-celda.es-hoy { background: #55334c; border-color: #ec9ed0; }
+html[data-tema="oscuro"] .pagina-agenda .agenda-muestra { background: #493358; color: #f1e6f8; }
+html[data-tema="oscuro"] .pagina-agenda .agenda-muestra.cat-citas { background: #5a334c; }
+html[data-tema="oscuro"] .pagina-agenda .agenda-muestra.cat-hogar { background: #2d493f; }
+html[data-tema="oscuro"] .pagina-agenda .agenda-muestra.cat-personal { background: #4b4029; }
+html[data-tema="oscuro"] .pagina-agenda .agenda-tarjeta-acciones .agenda-completar { background: #28483c; color: #c7eed9; border-color: #527562; }
+@media (max-width: 700px) {
+  .pagina-agenda .agenda-contenido { padding: 20px 4%; }
+  body .agenda-bienvenida { padding: 20px; }
+  .pagina-agenda .agenda-barra-superior { flex-wrap: wrap; gap: 12px; }
+  .pagina-agenda .agenda-vistas { display: flex; width: 100%; }
+  .pagina-agenda .agenda-vistas button { flex: 1; padding-inline: 12px; }
+  .pagina-agenda #nuevaTarea { width: 100%; }
+  .pagina-agenda .agenda-dia { padding: 20px 14px; }
+  .pagina-agenda .agenda-dia-cabecera { gap: 14px; }
+  .pagina-agenda .agenda-dia-cabecera h2 { font-size: 1.375rem; }
+  .pagina-agenda .agenda-dia-cabecera > .agenda-navegacion { width: 100%; justify-content: space-between; }
+  .pagina-agenda .agenda-dia-cabecera > .agenda-navegacion input { width: 155px; }
+  .pagina-agenda .agenda-tarjeta { padding: 18px 14px; }
+  .pagina-agenda .agenda-tarjeta-acciones .agenda-completar { flex: 1 1 100%; }
+  .pagina-agenda .agenda-tarjeta-acciones { gap: 8px; }
+  .pagina-agenda .agenda-herramientas .agenda-lateral { grid-template-columns: minmax(0,1fr); padding: 0 14px 14px; }
+  .pagina-agenda .agenda-herramientas .agenda-lateral > div { grid-column: auto; }
+  :is(.agenda-herramientas, .agenda-detalles-tarea) > summary span { flex-basis: 80%; }
+  .pagina-agenda .agenda-mes-cabecera { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .pagina-agenda .agenda-mes-cabecera .agenda-navegacion { width: 100%; justify-content: space-between; }
+  body.pagina-agenda .agenda-tabla td .agenda-dia-celda { min-height: 85px; padding: 5px 2px; }
+  body.pagina-agenda .agenda-tabla td .agenda-dia-celda.es-hoy { padding: 4px 1px; }
+  .pagina-agenda .agenda-dia-numero { font-size: 1rem; gap: 3px; }
+  .pagina-agenda .agenda-dia-numero em { font-size: .5625rem; padding: 1px 2px; }
+  .pagina-agenda .agenda-dia-cantidad { font-size: .75rem; }
+  .pagina-agenda .agenda-tabla th { font-size: .8125rem; }
+  .pagina-agenda .agenda-puntos-dia i { width: 6px; height: 6px; }
+  .pagina-agenda .agenda-leyenda { gap: 6px; }
+  .pagina-agenda .agenda-leyenda span { font-size: .8125rem; padding: 6px 8px; }
+  .pagina-agenda .agenda-dialogo { padding: 22px 16px; }
+  .pagina-agenda .agenda-form-fila { grid-template-columns: minmax(0,1fr); gap: 0; }
+  .pagina-agenda .agenda-filtros { padding-inline: 14px; }
+}

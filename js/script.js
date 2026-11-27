@@ -1,3 +1,5 @@
+// Comportamiento común: menú, animación, tema visual y filtros de vídeos.
+
 // Abrir y cerrar el menú en pantallas pequeñas
 const botonMenu = document.getElementById('menuBoton');
 const menu = document.getElementById('menu');
@@ -36,6 +38,8 @@ const temaBoton = document.getElementById('temaBoton');
 const temaSistema = window.matchMedia('(prefers-color-scheme: dark)');
 let temaElegido = false;
 try { temaElegido = Boolean(localStorage.getItem('cuidapoyo-tema')); } catch (e) {}
+
+// Aplica el tema visual y sincroniza los atributos accesibles del botón.
 function aplicarTema(oscuro) {
   document.documentElement.dataset.tema = oscuro ? 'oscuro' : 'claro';
   if (temaBoton) {
@@ -56,26 +60,98 @@ temaSistema.addEventListener('change', function (evento) {
 });
 
 // Abrir el recurso enlazado al llegar desde otra página o tarjeta.
+
+// Abre el recurso indicado por el fragmento de la URL.
 function abrirRecursoEnlazado() {
   const destino = document.getElementById(location.hash.slice(1));
   if (destino && destino.tagName === 'DETAILS') destino.open = true;
 }
 abrirRecursoEnlazado();
 window.addEventListener('hashchange', abrirRecursoEnlazado);
-// Filtrar la videoteca por temas sin salir de la página.
+// Filtra los tutoriales combinando el tema seleccionado y el texto del buscador.
 const filtrosVideos = document.querySelectorAll('.video-filtros button');
 const tarjetasVideos = document.querySelectorAll('.video-tarjeta');
+const abrirBusquedaVideos = document.getElementById('abrirBusquedaVideos');
+const busquedaVideos = document.getElementById('busquedaVideos');
+const buscarVideos = document.getElementById('buscarVideos');
+let temaVideos = 'todos';
+
+// Ignora las tildes, las mayúsculas y los espacios sobrantes al buscar.
+function normalizarBusquedaVideos(texto) {
+  return texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+// Busca en el título, la categoría y palabras habituales asociadas a cada tema.
+function filtrarVideos() {
+  const consulta = normalizarBusquedaVideos(buscarVideos ? buscarVideos.value : '');
+  const palabras = consulta.split(/\s+/).filter(Boolean);
+  const sinonimos = {
+    alimentacion: 'comida comidas comer alimentos nutrición',
+    higiene: 'aseo lavar limpieza',
+    movilidad: 'moverse caminar andar movilización',
+    bienestar: 'descanso descansar emociones autocuidado',
+    acompanamiento: 'acompañar compañía escuchar',
+    organizacion: 'organizar tareas rutinas repartir'
+  };
+  let visibles = 0;
+
+  tarjetasVideos.forEach(function (tarjeta) {
+    const categoria = tarjeta.dataset.categoria;
+    const texto = normalizarBusquedaVideos(
+      tarjeta.querySelector('h3').textContent + ' ' + categoria + ' ' + (sinonimos[categoria] || '')
+    );
+    const coincideTema = temaVideos === 'todos' || categoria === temaVideos;
+    tarjeta.hidden = !coincideTema || !palabras.every(function (palabra) { return texto.includes(palabra); });
+    if (!tarjeta.hidden) visibles++;
+  });
+
+  const cantidad = document.getElementById('videosCantidad');
+  const sinResultados = document.getElementById('videosSinResultados');
+  if (cantidad) cantidad.textContent = visibles + (visibles === 1 ? ' tutorial en preparación' : ' tutoriales en preparación');
+  if (sinResultados) sinResultados.hidden = visibles !== 0;
+}
+
+// Conserva los filtros por tema y aplica también la búsqueda escrita.
 filtrosVideos.forEach(function (boton) {
   boton.addEventListener('click', function () {
-    const tema = boton.dataset.tema;
+    temaVideos = boton.dataset.tema;
     filtrosVideos.forEach(function (filtro) {
       filtro.setAttribute('aria-pressed', String(filtro === boton));
     });
-    let visibles = 0;
-    tarjetasVideos.forEach(function (tarjeta) {
-      tarjeta.hidden = tema !== 'todos' && tarjeta.dataset.categoria !== tema;
-      if (!tarjeta.hidden) visibles++;
-    });
-    document.getElementById('videosCantidad').textContent = visibles + (visibles === 1 ? ' tutorial en preparación' : ' tutoriales en preparación');
+    filtrarVideos();
   });
 });
+
+// La lupa abre el campo y le da el foco. Al cerrarlo se limpia la búsqueda.
+if (abrirBusquedaVideos && busquedaVideos && buscarVideos) {
+  function cerrarBusquedaVideos() {
+    busquedaVideos.hidden = true;
+    abrirBusquedaVideos.setAttribute('aria-expanded', 'false');
+    abrirBusquedaVideos.setAttribute('aria-label', 'Buscar tutoriales');
+    abrirBusquedaVideos.title = 'Buscar tutoriales';
+    buscarVideos.value = '';
+    filtrarVideos();
+    abrirBusquedaVideos.focus();
+  }
+
+  abrirBusquedaVideos.addEventListener('click', function () {
+    if (!busquedaVideos.hidden) {
+      cerrarBusquedaVideos();
+      return;
+    }
+    busquedaVideos.hidden = false;
+    abrirBusquedaVideos.setAttribute('aria-expanded', 'true');
+    abrirBusquedaVideos.setAttribute('aria-label', 'Cerrar búsqueda de tutoriales');
+    abrirBusquedaVideos.title = 'Cerrar búsqueda';
+    buscarVideos.focus();
+  });
+
+  // Actualiza los resultados al escribir y permite cerrar el campo con Escape.
+  buscarVideos.addEventListener('input', filtrarVideos);
+  buscarVideos.addEventListener('keydown', function (evento) {
+    if (evento.key === 'Escape') {
+      evento.preventDefault();
+      cerrarBusquedaVideos();
+    }
+  });
+}

@@ -1,7 +1,11 @@
+// Pruebas del motor: reconocimiento de temas, variantes y continuidad del contexto.
+
 /* Pruebas sin dependencias. Abrir pruebas.html en un navegador. */
 (function () {
   'use strict';
   const resultados=[];
+
+  // Registra si se cumple la condición de prueba y conserva los detalles de los fallos.
   function comprobar(nombre, condicion, detalle) {
     resultados.push({nombre,ok:Boolean(condicion),detalle:condicion?'':String(detalle||'Condición incumplida')});
   }
@@ -16,11 +20,15 @@
       comprobar(i.id+': '+q,r.intencion===i.id,'Recibido: '+r.intencion);
     }
   }
+
+  // Consultas para comprobar variantes, erratas, negaciones y situaciones urgentes.
   const casos = [["mi abuelo no puede andar","movilidad"],["necesito ayuda para caminar","movilidad"],["tiene problemas de movildad","movilidad"],["movildad","movilidad"],["ALIMENTACIÓN","alimentacion"],["mi madre no quiere comer","apetito"],["mi padre no tiene hambre","apetito"],["No quiero hablar de movilidad, quiero ayuda para comer","alimentacion"],["No necesito ayuda con la higiene sino con el sueño","sueno"],["No está triste, se siente sola","soledad"],["No se ha caído, quiero prevenir caídas","caidas"],["No tiene dolor en el pecho, quiero ver los tutoriales","tutoriales"],["Mi abuelo no puede respirar","emergencia"],["Mi abuela está inconsciente","emergencia"],["de repente no puede caminar","emergencia"],["Mi padre se ha caído","caida_actual"],["estoy reventada cuidando a mi madre","cuidador"],["necesito un relevo","respiro"],["no doy abasto","cuidador"],["le cuesta andar","movilidad"],["ayuda con las pastillas","medicacion"],["Dónde puedo ver vídeos sobre higiene","tutoriales"],["Dónde están las preguntas frecuentes","recursos_web"],["Que puedo hacer para la hidratacion","hidratacion"],["se despierta durante la noche","sueno"],["cómo organizar los turnos con mis hermanos","reparto"],["No quiero hablar de movilidad y quiero ver los recursos","recursos_web"],["Ola buenas","saludo"],["Mi abuelita necesita que la ayude a andar","movilidad"],["Me cuesta moverme por casa","movilidad"],["El abuelo tiene poca moviliad","movilidad"],["Como ayudo a mi padre a lebantarse","transferencias"],["Cómo levantarlo sin hacerme daño","transferencias"],["Tengo que pasar a mi madre de la cama al sillón","transferencias"],["El abuelo necesita un baston para andar","andador"],["Tiene una silla de ruedas y me preocupan los frenos","silla_ruedas"],["Como evito que tropiece con los cables","iluminacion"],["La ducha es peligrosa para mi abuela","ducha"],["Cómo puedo asearla sin que se sienta incómoda","higiene"],["Necesita que le ayude a lavarse los dientes","bucal"],["Su dentadura le molesta","bucal"],["No puede ponerse la camiseta","vestido"],["Tengo que cambiarle el pañal","incontinencia"],["Tiene una llaga en la espalda","piel"],["Está todo el día tumbado","piel"],["Mi madre come cada vez menos","apetito"],["Cómo hago para que tome más agua","hidratacion"],["Le cuesta mucho tragarse la comida","deglucion"],["Mi madre tose cuando bebe","deglucion"],["No tiene apetito desde ayer","apetito"],["Qué comidas preparo para mi padre","alimentacion"],["Mi padre se siente aislado","soledad"],["Mi madre se aburre mucho","actividades"],["Quiero ideas para entretener a mi abuelo","actividades"],["Tiene miedo y está nervioso","ansiedad"],["Mi madre lleva días llorando","emociones"],["Mi padre olvida donde deja las cosas","memoria"],["Como puedo hablarle si no oye","comunicacion"],["No consigo dormir por las noches","sueno"],["Mi abuela no duerme bien","sueno"],["Se despierta a cada rato","sueno"],["Estoy muy cansada de cuidar a mi padre","cuidador"],["Quisiera que mis hermanas colaboraran","reparto"],["Siento que soy egoísta por descansar","culpa"],["Necesitamos alguien que nos releve","respiro"],["Cómo consigo asistencia a domicilio","domicilio"],["Qué ayudas ofrece el ayuntamiento","servicios"],["Cómo solicito el grado de dependencia","valoracion"],["Cómo funciona el botón que llevan al cuello","teleasistencia"],["Mi padre necesita un centro de dia","centro_dia"],["Busco residencia para mi abuela","residencia"],["Mi madre necesita cambiar de medicación","medicacion"],["Qué dosis debo darle","medicacion"],["Puedo ver los videos en esta pagina","tutoriales"],["Quiero escribir a las creadoras de la web","contacto"],["Cómo pongo el tema oscuro","tema_web"],["Los mensajes se guardan","privacidad"],["No necesito ayuda para caminar, sino para beber","hidratacion"],["No está triste, solo aburrida","actividades"],["No quiero videos sino recursos escritos","recursos_web"],["No busco una residencia, necesito un centro de día","centro_dia"],["No tiene problemas de movilidad, pero come muy poco","apetito"],["camniar","movilidad"],["necesito un andador para moverme","andador"]];
   for (const [q,id] of casos) {
     const r=motor.crearConversacion().responder(q);
     comprobar('Variante: '+q,r.intencion===id,'Esperado '+id+', recibido '+r.intencion);
   }
+
+  // Comprueba seguimientos, cambios de tema, aclaraciones y reinicio del contexto.
   let c=motor.crearConversacion();
   comprobar('Seguimiento sin contexto pregunta antes',c.responder('¿Qué necesito?').tipo==='aclaracion');
   c.responder('Mi abuelo no puede andar');
@@ -51,6 +59,8 @@
   comprobar('Sugerencias relacionadas y dinámicas',JSON.stringify(c.responder('Ayuda para caminar').opciones)!==JSON.stringify(c.responder('Cómo ayudar con el aseo').opciones));
   comprobar('Tratamiento deriva sin pautar dosis',c.responder('Qué pastilla le puedo dar').texto.includes('No puedo recomendar'));
   comprobar('Enlace real de tutoriales',c.responder('Ver tutoriales').enlace.url==='tutoriales.html');
+
+  // Publica los resultados del motor y muestra el recuento de fallos.
   window.resultadosMotor=resultados;
   const destino=document.getElementById('resultados');
   for (const r of resultados) {

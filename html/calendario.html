@@ -10,7 +10,10 @@
   <script>try{const t=localStorage.getItem('cuidapoyo-tema');document.documentElement.dataset.tema=t==='oscuro'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches)?'oscuro':'claro';}catch(e){}</script>
   <link rel="stylesheet" href="../css/styles.css"><link rel="stylesheet" href="../css/calendario.css?v=1">
   <script src="../js/script.js" defer></script><script src="../js/cuenta/datos.js" defer></script><script src="../js/cuenta/catalogo.js" defer></script><script src="../js/cuenta/acceso.js" defer></script><script src="../js/calendario/datos.js?v=1" defer></script><script src="../js/calendario/interfaz.js?v=1" defer></script>
-<link rel="stylesheet" href="../css/cuenta.css"><script src="../js/cuenta/integraciones.js" defer></script></head>
+<link rel="stylesheet" href="../css/cuenta.css"><script src="../js/cuenta/integraciones.js" defer></script>
+<link rel="stylesheet" href="../css/tema-elegante.css">
+<link rel="stylesheet" href="../css/calendario-sencillo.css">
+</head>
 <body class="pagina-agenda">
 <a class="agenda-salto" href="#agenda">Ir al calendario</a>
 <header class="cabecera">
@@ -21,36 +24,37 @@
 </header>
 <main id="contenido" class="agenda-contenido">
   <section class="agenda-bienvenida" aria-labelledby="agendaTitulo">
-    <div><p class="agenda-rotulo">TU DÍA, CON UN POCO MÁS DE CALMA</p><h1 id="agendaTitulo">Espacio para <span>lo importante.</span></h1><p>Organiza los cuidados. Comparte las tareas. Reserva un ratito para ti.</p></div>
+    <div><p class="agenda-rotulo">TU DÍA, CON UN POCO MÁS DE CALMA</p><h1 id="agendaTitulo">Tus cuidados, <span>paso a paso.</span></h1><p>Mira qué tienes para hoy o añade una tarea. Tú marcas el ritmo.</p></div>
     <div class="agenda-dibujo" aria-hidden="true"><span>✦</span><div>un día<br><em>a la vez</em><b>♡</b></div><i>✳</i></div>
   </section>
   <div id="avisoAlmacen" class="agenda-alerta" hidden></div>
   <section class="agenda-distribucion" id="agenda" aria-label="Mi organizador">
-    <aside class="agenda-lateral">
+    <details class="agenda-herramientas"><summary>Más opciones <span>Atajos, próximas tareas y copias de seguridad</span></summary><aside class="agenda-lateral">
       <div class="agenda-hoy"><p class="agenda-rotulo">HOY ES</p><h2 id="hoyTitulo"></h2><p id="hoyFecha"></p><button type="button" id="irHoy" class="agenda-enlace">Ver mi día</button><div class="agenda-progreso"><div id="circuloProgreso" class="agenda-circulo"><strong id="porcentajeHoy">0%</strong></div><div><strong id="resumenHoy"></strong><span>paso a paso también se avanza</span></div></div></div>
       <div class="agenda-atajos"><h2>Un pequeño comienzo</h2><p>Prepara una tarea y ajústala a tu día.</p><button type="button" data-plantilla="paseo"><span aria-hidden="true">☀</span> Paseo y compañía <b aria-hidden="true">+</b></button><button type="button" data-plantilla="comida"><span aria-hidden="true">◒</span> Preparar las comidas <b aria-hidden="true">+</b></button><button type="button" data-plantilla="cita"><span aria-hidden="true">▧</span> Una cita o visita <b aria-hidden="true">+</b></button><button type="button" data-plantilla="pausa"><span aria-hidden="true">♡</span> Un momento para mí <b aria-hidden="true">+</b></button></div>
       <div class="agenda-proximas"><h2>Lo próximo</h2><p class="agenda-secundario">Tus siguientes tareas por hacer.</p><ul id="proximas"></ul><button type="button" class="agenda-enlace" id="verAtrasadas" hidden></button></div>
       <div class="agenda-copia"><span class="agenda-copia-icono" aria-hidden="true">▤</span><h2>Tu organización, a salvo</h2><p id="estadoGuardado">Se guarda en este navegador. Descarga una copia para conservarla o llevarla a otro dispositivo.</p><div><button id="exportar" type="button" class="agenda-enlace">Descargar copia</button><button id="importar" type="button" class="agenda-enlace">Importar copia</button></div><input id="archivoImportar" type="file" accept=".json,application/json" hidden><p class="agenda-privacidad">No se sincroniza entre dispositivos. Evita anotar datos médicos sensibles.</p></div>
-    </aside>
+    </aside></details>
     <div class="agenda-principal">
-      <div class="agenda-barra-superior"><div class="agenda-vistas" role="group" aria-label="Vista de la agenda"><button type="button" id="vistaMes" aria-pressed="true">Mes</button><button type="button" id="vistaDia" aria-pressed="false">Mi día</button></div><button type="button" id="nuevaTarea" class="agenda-boton principal"><span aria-hidden="true">+</span> Nueva tarea</button></div>
-      <div class="agenda-filtros">
+      <div class="agenda-barra-superior"><div class="agenda-vistas" role="group" aria-label="Vista de la agenda"><button type="button" id="vistaDia" aria-pressed="true">Mi día</button><button type="button" id="vistaMes" aria-pressed="false">Calendario</button></div><button type="button" id="nuevaTarea" class="agenda-boton principal"><span aria-hidden="true">+</span> Añadir tarea</button></div>
+      <details class="agenda-filtros-panel" id="opcionesFiltros"><summary>Buscar o filtrar <span id="filtrosIndicador" hidden>Filtros activos</span></summary><div class="agenda-filtros">
         <label class="agenda-busqueda"><span class="solo-lector">Buscar tareas o responsables</span><span aria-hidden="true">⌕</span><input id="buscarTareas" type="search" placeholder="Buscar una tarea o responsable…" maxlength="120"></label>
-        <label><span class="solo-lector">Categoría</span><select id="filtroCategoria"><option value="">Todas las categorías</option><option value="cuidados">Cuidados</option><option value="citas">Citas</option><option value="hogar">Hogar</option><option value="personal">Tiempo para mí</option></select></label>
-        <label><span class="solo-lector">Estado</span><select id="filtroEstado"><option value="">Todos los estados</option><option value="pendiente">Por hacer</option><option value="curso">En curso</option><option value="hecha">Hecho</option></select></label>
-        <button type="button" id="limpiarFiltros" class="agenda-enlace" hidden>Quitar filtros</button>
+        <label><span class="agenda-filtro-etiqueta">Tipo de tarea</span><select id="filtroCategoria"><option value="">Todas las categorías</option><option value="cuidados">Cuidados</option><option value="citas">Citas</option><option value="hogar">Hogar</option><option value="personal">Tiempo para mí</option></select></label>
+        <label><span class="agenda-filtro-etiqueta">Estado</span><select id="filtroEstado"><option value="">Todos los estados</option><option value="pendiente">Por hacer</option><option value="curso">En curso</option><option value="hecha">Hecho</option></select></label>
+        <label><span class="agenda-filtro-etiqueta">Ir a otro mes</span><input type="month" id="elegirMes" min="1900-01" max="2099-12"></label><button type="button" id="limpiarFiltros" class="agenda-enlace" hidden>Quitar filtros</button>
       </div>
+      </details>
       <div id="estadisticasMes" class="agenda-estadisticas" aria-label="Resumen del mes"></div>
       <section id="panelMes" class="agenda-mes" aria-labelledby="mesTitulo">
-        <div class="agenda-mes-cabecera"><div><p class="agenda-rotulo" id="mesAno"></p><h2 id="mesTitulo"></h2></div><div class="agenda-navegacion"><button type="button" id="mesAnterior" aria-label="Mes anterior">‹</button><button type="button" id="mesHoy">Hoy</button><button type="button" id="mesSiguiente" aria-label="Mes siguiente">›</button><label class="agenda-elegir-mes"><span class="solo-lector">Ir a otro mes</span><input type="month" id="elegirMes" min="1900-01" max="2099-12" aria-label="Ir a otro mes"></label></div></div>
-        <p class="agenda-mes-instruccion">Un vistazo a tu mes. Pulsa un día para organizar sus tareas.</p>
+        <div class="agenda-mes-cabecera"><div><p class="agenda-rotulo" id="mesAno"></p><h2 id="mesTitulo"></h2></div><div class="agenda-navegacion"><button type="button" id="mesAnterior" aria-label="Mes anterior">‹</button><button type="button" id="mesHoy">Hoy</button><button type="button" id="mesSiguiente" aria-label="Mes siguiente">›</button></div></div>
+        <p class="agenda-mes-instruccion">Toca un día para ver sus tareas.</p>
         <table class="agenda-tabla" aria-describedby="ayudaCalendario"><thead><tr><th scope="col"><abbr title="Lunes">Lun</abbr></th><th scope="col"><abbr title="Martes">Mar</abbr></th><th scope="col"><abbr title="Miércoles">Mié</abbr></th><th scope="col"><abbr title="Jueves">Jue</abbr></th><th scope="col"><abbr title="Viernes">Vie</abbr></th><th scope="col"><abbr title="Sábado">Sáb</abbr></th><th scope="col"><abbr title="Domingo">Dom</abbr></th></tr></thead><tbody id="diasMes"></tbody></table>
         <div class="agenda-leyenda"><span><i class="marca-cuidados"></i> Cuidados</span><span><i class="marca-citas"></i> Citas</span><span><i class="marca-hogar"></i> Hogar</span><span><i class="marca-personal"></i> Tiempo para mí</span></div>
-        <p id="ayudaCalendario" class="agenda-ayuda">Con teclado: usa las flechas para cambiar de día y Enter para abrirlo.</p>
+        <p id="ayudaCalendario" class="solo-lector">Con teclado: usa las flechas para cambiar de día y Enter para abrirlo.</p>
       </section>
       <section id="panelDia" class="agenda-dia" aria-labelledby="diaTitulo" hidden>
         <div class="agenda-dia-cabecera"><div><button type="button" id="volverMes" class="agenda-enlace">Volver al calendario</button><h2 id="diaTitulo" tabindex="-1"></h2><p id="diaResumen"></p></div><div class="agenda-navegacion"><button type="button" id="diaAnterior" aria-label="Día anterior">‹</button><label><span class="solo-lector">Elegir día</span><input type="date" id="elegirDia" min="1900-01-01" max="2099-12-31"></label><button type="button" id="diaSiguiente" aria-label="Día siguiente">›</button></div></div>
-        <p class="agenda-ayuda" id="ayudaTablero">Arrastra una tarjeta a otra columna o utiliza su selector de estado. En móvil, usa el selector.</p>
+        <p class="solo-lector" id="ayudaTablero">Arrastra una tarjeta a otra columna o utiliza su selector de estado. En móvil, usa el selector.</p>
         <div id="tablero" class="agenda-tablero" aria-describedby="ayudaTablero"></div>
         <button type="button" id="limpiarHechas" class="agenda-enlace" hidden>Retirar las tareas hechas de este día</button>
       </section>
@@ -66,13 +70,17 @@
     <div class="agenda-dialogo-cabecera"><div><p class="agenda-rotulo">UN PASO MÁS SENCILLO</p><h2 id="tituloDialogo">Nueva tarea</h2></div><button type="button" id="cerrarTarea" class="agenda-icono" aria-label="Cerrar formulario">×</button></div>
     <label>¿Qué quieres hacer? <span aria-hidden="true">*</span><input id="tareaTitulo" name="titulo" maxlength="120" placeholder="Por ejemplo: preparar la comida" required></label>
     <div class="agenda-form-fila"><label>Día <span aria-hidden="true">*</span><input type="date" id="tareaFecha" min="1900-01-01" max="2099-12-31" required></label><label>Hora <span class="agenda-opcional">opcional</span><input type="time" id="tareaHora"></label></div>
-    <div class="agenda-form-fila"><label>Categoría<select id="tareaCategoria"><option value="cuidados">Cuidados</option><option value="citas">Citas</option><option value="hogar">Hogar</option><option value="personal">Tiempo para mí</option></select></label><label>Prioridad<select id="tareaPrioridad"><option value="normal">Sin prisa especial</option><option value="alta">Importante</option></select></label></div>
-    <div class="agenda-form-fila"><label>Estado<select id="tareaEstado"><option value="pendiente">Por hacer</option><option value="curso">En curso</option><option value="hecha">Hecho</option></select></label><label>¿Quién se encarga? <span class="agenda-opcional">opcional</span><input id="tareaResponsable" maxlength="80" placeholder="Por ejemplo: yo, Ana…"></label></div>
-    <label>Notas <span class="agenda-opcional">opcional</span><textarea id="tareaNotas" maxlength="2000" rows="2" placeholder="Lo que conviene recordar, sin datos sensibles."></textarea></label>
-    <label>Pasos pequeños <span class="agenda-opcional">uno por línea, hasta 20</span><textarea id="tareaPasos" maxlength="2400" rows="3" placeholder="Preparar la bolsa&#10;Comprobar la hora&#10;Pedir acompañamiento"></textarea></label>
-    <div id="repeticionCampos" class="agenda-form-fila"><label>Repetir<select id="tareaRepetir"><option value="ninguna">Solo este día</option><option value="diaria">Cada día</option><option value="laborables">De lunes a viernes</option><option value="semanal">Cada semana</option></select></label><label id="cantidadCampo" hidden>Número de tareas, incluida esta<input id="tareaCantidad" type="number" min="1" max="52" value="7"></label></div>
-    <p id="notaSerie" class="agenda-ayuda" hidden>Estás editando solo esta tarea. Las otras repeticiones conservan sus datos.</p>
-    <p class="agenda-ayuda">La hora organiza las tareas; no envía alarmas ni notificaciones.</p>
+    <label>Tipo de tarea<select id="tareaCategoria"><option value="cuidados">Cuidados</option><option value="citas">Citas</option><option value="hogar">Hogar</option><option value="personal">Tiempo para mí</option></select></label>
+    <details class="agenda-detalles-tarea" id="tareaDetalles">
+      <summary>Más detalles <span>Repetir, notas o responsable</span></summary>
+      <div class="agenda-form-fila"><label>Prioridad<select id="tareaPrioridad"><option value="normal">Normal</option><option value="alta">Importante</option></select></label><label>Estado<select id="tareaEstado"><option value="pendiente">Por hacer</option><option value="curso">En curso</option><option value="hecha">Hecho</option></select></label></div>
+      <label>¿Quién se encarga? <span class="agenda-opcional">opcional</span><input id="tareaResponsable" maxlength="80" placeholder="Por ejemplo: yo, Ana…"></label>
+      <label>Notas <span class="agenda-opcional">opcional</span><textarea id="tareaNotas" maxlength="2000" rows="2" placeholder="Lo que conviene recordar, sin datos sensibles."></textarea></label>
+      <label>Pasos pequeños <span class="agenda-opcional">uno por línea, hasta 20</span><textarea id="tareaPasos" maxlength="2400" rows="3" placeholder="Preparar la bolsa&#10;Comprobar la hora&#10;Pedir acompañamiento"></textarea></label>
+      <div id="repeticionCampos" class="agenda-form-fila"><label>Repetir<select id="tareaRepetir"><option value="ninguna">Solo este día</option><option value="diaria">Cada día</option><option value="laborables">De lunes a viernes</option><option value="semanal">Cada semana</option></select></label><label id="cantidadCampo" hidden>Número de tareas, incluida esta<input id="tareaCantidad" type="number" min="1" max="52" value="7"></label></div>
+      <p id="notaSerie" class="agenda-ayuda" hidden>Estás editando solo esta tarea. Las otras repeticiones conservan sus datos.</p>
+      <p class="agenda-ayuda">La hora organiza las tareas; no envía alarmas ni notificaciones.</p>
+    </details>
     <p id="errorTarea" class="agenda-error" role="alert"></p>
     <div class="agenda-dialogo-pie"><button type="button" id="cancelarTarea" class="agenda-boton">Cancelar</button><button type="submit" class="agenda-boton principal">Guardar tarea</button></div>
   </form>

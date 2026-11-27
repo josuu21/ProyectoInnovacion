@@ -1,3 +1,5 @@
+// Chat: reconocimiento de consultas y contexto de la conversación.
+
 /* Motor local: puntuación de evidencias, tolerancia tipográfica y contexto.
  * No ejecuta mensajes como código ni realiza peticiones de red.
  */
@@ -5,12 +7,18 @@
   'use strict';
   const base = raiz.CuidaConocimiento;
   const porId = new Map(base.map(intencion => [intencion.id, intencion]));
+
+  // Unifica mayúsculas, acentos y separadores para comparar consultas.
   function normalizar(texto) {
     return String(texto).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .replace(/ñ/g, 'n').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
   }
+
+  // Palabras frecuentes que se excluyen para buscar los términos relevantes.
   const vacias = new Set(('a al algo alguna algunos ante aqui asi ayudar ayuda buen buenos buenas como con cual cuando de del desde donde el ella ellos en es esta estas este esto hacer hacia hay la las le les lo los mas me mi mis muy necesito necesita nos o para persona personas puedo puede pueden que quien quiero se ser si sin sobre son su sus te tengo tiene tienen tu tus un una unos unas y ya yo por porque no ni').split(' '));
   ['abuelo','abuela','abuelos','abuelita','abuelito','padre','madre','papa','mama','bien','mucho','favor'].forEach(t=>vacias.add(t));
+
+  // Agrupa sinónimos y variantes bajo un mismo concepto.
   const grupos = [
     ['caminar','andar','camina','caminando','camino','anda','andando','desplazarse','desplazar','desplazamiento','desplazamientos'],
     ['movilidad','moverse','movimiento','mover','moverme','moverlo','moverla'], ['comer','come','comiendo','comen'], ['comida','comidas','alimentacion','alimentar','nutricion'],
@@ -35,6 +43,8 @@
   grupos.forEach(grupo => grupo.forEach(palabra => alias.set(palabra, grupo[0])));
   const canon = palabra => alias.get(palabra) || palabra;
   const tokens = texto => [...new Set(normalizar(texto).split(' ').filter(t => t && !vacias.has(t)).map(canon))];
+
+  // Calcula la distancia entre palabras, incluidas letras intercambiadas, para detectar erratas.
   function distancia(a, b) {
     if (Math.abs(a.length - b.length) > 2) return 3;
     let anteanterior = null;
@@ -50,11 +60,15 @@
     }
     return anterior[b.length];
   }
+
+  // Prepara los términos de cada intención para calcular sus coincidencias.
   const documentos = base.map(i => ({...i, terminos: new Set(tokens(i.claves.concat(i.ejemplos).join(' ')))}));
   const frecuencia = new Map();
   documentos.forEach(i => i.terminos.forEach(t => frecuencia.set(t, (frecuencia.get(t)||0)+1)));
   const peso = t => 1 + Math.log(1 + base.length / (frecuencia.get(t) || 1));
   const vocabulario = [...new Set([...frecuencia.keys(), ...alias.keys()])];
+
+  // Busca una palabra cercana en el vocabulario cuando el término no se reconoce.
   function corregir(t) {
     if (frecuencia.has(t) || t.length < 5) return {token:t, factor:1};
     let candidato = null, minimo = 3;
@@ -65,6 +79,8 @@
     }
     return {token:candidato || t, factor:candidato ? .78 : 1};
   }
+
+  // Separa la consulta y distingue los temas negados de las limitaciones expresadas.
   function clausulas(texto) {
     // El alcance de la negación acaba con la cláusula, no con toda la pregunta.
     return String(texto).toLowerCase().replace(/\bsolo (?=(?:aburrid[oa]|triste|cansad[oa]|nervios[oa])\b)/gi, 'solamente ').split(/[,.!?;:\n]+|\b(?:pero|sino|aunque|en cambio)\b|\by (?=(?:quiero|necesito|busco|prefiero)\b)/i).map(normalizar).filter(Boolean).map(texto => {
@@ -73,6 +89,8 @@
       return {texto, negada, tokens: tokens(texto).map(corregir)};
     });
   }
+
+  // Puntúa las intenciones según palabras clave, ejemplos y coincidencias de la consulta.
   function clasificar(texto) {
     const partes = clausulas(texto);
     return documentos.map(i => {
@@ -111,18 +129,28 @@
       return {id:i.id, score:mejor};
     }).filter(i => i.score>0).sort((a,b)=>b.score-a.score);
   }
+
+  // Temas sugeridos cuando todavía no existe un contexto concreto.
   const iniciales = ['movilidad','higiene','alimentacion','cuidador','servicios','capacidades'];
+
+  // Mantiene el tema, las aclaraciones pendientes y las variantes de cada conversación.
   function crearConversacion() {
     let ultimo = null, pendientes = [], turno = 0;
     const variantes = new Map();
+
+    // Alterna las respuestas de una intención para evitar repeticiones consecutivas.
     function elegir(i) {
       const indice = variantes.get(i.id) || 0;
       variantes.set(i.id, indice+1);
       return i.respuestas[indice % i.respuestas.length];
     }
+
+    // Convierte identificadores de intenciones en opciones para la interfaz.
     function opciones(ids) {
       return [...new Set(ids)].filter(id=>porId.has(id)).slice(0,6).map(id=>({id,texto:porId.get(id).titulo}));
     }
+
+    // Compone la respuesta con su contenido, enlace y sugerencias de seguimiento.
     function resultado(i, modo, prefijo) {
       if (i.categoria!=='inicio') ultimo=i.id;
       pendientes=[];
@@ -131,10 +159,14 @@
       return {tipo:'respuesta',intencion:i.id,tema:ultimo,texto:(prefijo||'')+contenido,enlace:i.enlace,
         opciones:seguir.concat(opciones(i.relacionadas)).slice(0,6)};
     }
+
+    // Guarda las opciones pendientes y pide concretar la consulta.
     function aclarar(ids, texto) {
       pendientes=ids;
       return {tipo:'aclaracion',intencion:null,tema:ultimo,texto,opciones:opciones(ids)};
     }
+
+    // Interpreta la consulta, prioriza urgencias y resuelve el tema o pide una aclaración.
     function responder(texto, eleccion) {
       turno++;
       const consulta=normalizar(texto);
@@ -186,6 +218,8 @@
       if (i.id==='movilidad' && /\bno (?:puede|puedo) (?:andar|caminar|moverse)\b/.test(consulta)) prefijo='Si ahora no puede caminar, no fuerces el desplazamiento. Si ha ocurrido de repente, solicita atención sanitaria urgente.\n\n';
       return resultado(i,null,prefijo);
     }
+
+    // Borra el tema, los turnos y las opciones pendientes de la conversación.
     function reiniciar() { ultimo=null; pendientes=[]; turno=0; variantes.clear(); }
     return {responder,reiniciar,estado:()=>({tema:ultimo,pendientes:pendientes.slice()})};
   }

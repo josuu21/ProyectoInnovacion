@@ -1,0 +1,76 @@
+/* Entrada del chat: una sonrisa breve que da paso a la conversación real. */
+.pagina-chatbot .pagina-intro { padding-block: 26px 30px; }
+.pagina-chatbot .pagina-intro .migas { margin-bottom: 18px; }
+.pagina-chatbot .pagina-intro h1 { font-size: clamp(28px, 3vw, 42px); margin-block: 12px 16px; }
+.pagina-chatbot .pagina-intro h1 br { display: none; }
+.pagina-chatbot .pagina-intro h1 span::before { content: ' '; white-space: pre; }
+.pagina-chatbot .pagina-intro > p:last-child { margin-bottom: 0; }
+.pagina-chatbot .chat { max-width: 1100px; padding-top: 28px; }
+.chat-escenario { position: relative; }
+.chat-bienvenida[hidden], .chat-panel[hidden] { display: none; }
+.chat-bienvenida {
+  position: relative; display: flex; flex-direction: column; align-items: center;
+  min-height: 430px; padding: 34px 24px 38px; text-align: center; overflow: hidden;
+  border: 1px solid var(--ui-borde); border-radius: 30px;
+  background: radial-gradient(ellipse at 50% 20%, #f3d4ee80, transparent 65%), var(--ui-superficie);
+  box-shadow: 0 20px 60px #81429412, inset 0 1px 0 #ffffffc0;
+}
+.chat-saludo-ilustracion { position: relative; width: 166px; height: 150px; display: grid; place-items: center; margin-bottom: 10px; }
+.chat-cara {
+  width: 112px; height: 112px; border-radius: 38%; transform: rotate(-7deg);
+  background: linear-gradient(145deg, #fffaff, #f7cde7 65%, #ddc4f5);
+  border: 2px solid #ffffffd9; color: #a63d87;
+  box-shadow: 0 16px 35px #a1409826, inset 0 2px 0 #fff;
+  animation: resuelve-saludo 1.5s ease-in-out both;
+}
+.chat-cara svg { width: 100%; height: 100%; }
+.chat-orbita { position: absolute; width: 150px; height: 150px; border: 1px solid #cc9fd64d; border-radius: 50%; transform: rotate(-25deg) scaleY(.8); }
+.chat-destello { position: absolute; color: #ae58a2; font-size: 26px; animation: resuelve-destello 1.3s ease-in-out both; }
+.chat-destello-uno { top: 2px; right: 0; }
+.chat-destello-dos { bottom: 8px; left: 0; font-size: 18px; color: #9575bd; animation-delay: .2s; }
+.chat-bienvenida .chat-bienvenida-rotulo { margin: 0 0 10px; color: var(--ui-rosa); font-size: .75rem; font-weight: 800; letter-spacing: .12em; }
+.chat-bienvenida h2 { margin: 0 0 10px; font: 700 clamp(26px, 3vw, 36px)/1.25 'DM Sans', sans-serif; letter-spacing: -.04em; color: var(--ui-titulo); }
+.chat-bienvenida h2 span { color: var(--ui-rosa); }
+.chat-bienvenida > p:not(.chat-bienvenida-rotulo) { margin: 0 0 22px; max-width: 40ch; color: var(--ui-texto); line-height: 1.65; }
+.chat-bienvenida button { min-height: 48px; cursor: pointer; }
+.chat-bienvenida-progreso { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--ui-gradiente); transform-origin: left; animation: resuelve-progreso 1.8s linear both; }
+.chat-abierto .chat-panel { animation: resuelve-abrir .45s cubic-bezier(.2,.7,.25,1) both; }
+/* Una identidad pequeña permanece en la cabecera al terminar la bienvenida. */
+.chat-identidad { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.chat-avatar { display: grid; place-items: center; flex: 0 0 48px; width: 48px; height: 48px; border: 1px solid #ffffffc9; border-radius: 17px; background: var(--ui-gradiente); color: #fff; box-shadow: 0 6px 16px #a1409826; }
+.chat-avatar svg { width: 34px; height: 34px; }
+.pagina-chatbot .chat-identidad h2 { margin-bottom: 2px; font-size: 1.3rem; }
+.pagina-chatbot .chat-identidad p { font-size: .875rem; color: var(--ui-texto); }
+.pagina-chatbot .chat-cabecera { gap: 14px; }
+.pagina-chatbot .chat-cabecera > button { min-height: 44px; font-size: .875rem; border-radius: 13px; }
+.pagina-chatbot .chat-mensajes { height: clamp(280px, 43vh, 430px); }
+.pagina-chatbot .chat-envio input { border-radius: 16px; box-shadow: inset 0 2px 5px #68397906; }
+html[data-tema="oscuro"] .chat-bienvenida { background: radial-gradient(ellipse at 50% 10%, #8d467c26, transparent 65%), var(--ui-superficie); box-shadow: var(--ui-sombra); }
+html[data-tema="oscuro"] .chat-cara { background: linear-gradient(145deg, #694074, #432e58); border-color: #d4a5e866; color: #f7c7e8; box-shadow: 0 15px 35px #0d071c40, inset 0 1px 0 #ffffff26; }
+html[data-tema="oscuro"] .chat-bienvenida :is(.chat-bienvenida-rotulo, h2 span) { color: #e4a7d1; }
+@keyframes resuelve-saludo { 0% { opacity: 0; transform: translateY(15px) rotate(-14deg) scale(.7); } 30% { opacity: 1; transform: translateY(-5px) rotate(5deg) scale(1.04); } 60% { transform: translateY(0) rotate(-7deg) scale(1); } 80% { transform: translateY(-5px) rotate(-3deg); } 100% { opacity: 1; transform: translateY(0) rotate(-7deg); } }
+@keyframes resuelve-destello { 0%, 100% { opacity: .45; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.15); } }
+@keyframes resuelve-progreso { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes resuelve-abrir { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+@media (max-width: 600px) {
+  .pagina-chatbot .pagina-intro { padding-block: 20px 24px; }
+  .pagina-chatbot .pagina-intro h1 { font-size: 28px; }
+  .pagina-chatbot .chat { padding-top: 20px; }
+  .chat-bienvenida { min-height: 410px; padding: 26px 18px 34px; border-radius: 24px; }
+  .chat-bienvenida .chat-bienvenida-rotulo { font-size: .6875rem; letter-spacing: .08em; }
+  .chat-identidad { gap: 10px; }
+  .chat-avatar { width: 42px; height: 42px; flex-basis: 42px; border-radius: 14px; }
+  .pagina-chatbot .chat-cabecera { align-items: flex-start; }
+  .pagina-chatbot .chat-cabecera > button { align-self: flex-start; padding: 9px 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-cara, .chat-destello, .chat-bienvenida-progreso, .chat-abierto .chat-panel { animation: none; }
+}
+
+/* Texto de conversación más grande para facilitar la lectura en cualquier pantalla. */
+.pagina-chatbot .chat-mensaje { font-size: 1.125rem; }
+.pagina-chatbot .chat-mensaje strong { font-size: 1rem; }
+.pagina-chatbot .chat-mensaje p { line-height: 1.7; }
+.pagina-chatbot .chat-envio input,
+.pagina-chatbot .chat-formulario > label,
+.pagina-chatbot .chat-opciones button { font-size: 1.0625rem; }

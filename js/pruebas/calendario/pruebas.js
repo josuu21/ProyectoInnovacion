@@ -1,3 +1,5 @@
+// Pruebas de agenda: fechas, validación, persistencia y acciones en la página real.
+
 /* Ejecutar en un perfil de navegador aislado. No usa bibliotecas externas. */
 (async function () {
   'use strict';
@@ -5,7 +7,11 @@
   const comprobar=(nombre,ok,detalle)=>resultados.push({nombre,ok:Boolean(ok),detalle:ok?'':String(detalle||'Condición incumplida')});
   const igual=(nombre,a,b)=>comprobar(nombre,JSON.stringify(a)===JSON.stringify(b),JSON.stringify(a)+' / '+JSON.stringify(b));
   const rechaza=(nombre,accion)=>{try{accion();comprobar(nombre,false);}catch(e){comprobar(nombre,true);}};
+
+  // Almacenamiento simulado para comprobar los datos sin modificar cuentas reales.
   const memoria=()=>{const datos=new Map();return {getItem:k=>datos.has(k)?datos.get(k):null,setItem:(k,v)=>datos.set(k,v),removeItem:k=>datos.delete(k)};};
+
+  // Casos de fechas: formato, años bisiestos, cambios de mes y de horario.
   const fecha='2026-11-24';
   comprobar('Año bisiesto',A.fechaValida('2028-02-29'));comprobar('Rechaza día imposible',!A.fechaValida('2026-02-29'));
   comprobar('Rechaza formato ambiguo',!A.fechaValida('24/11/2026'));comprobar('Rechaza meses imposibles',!A.fechaValida('2026-13-01'));
@@ -22,6 +28,8 @@
     comprobar(mes+': fechas únicas',new Set(celdas.map(d=>d.fecha)).size===celdas.length);
     comprobar(mes+': todos los días',delMes.length===new Date(Number(mes.slice(0,4)),Number(mes.slice(5,7)),0).getDate());
   }
+
+  // Casos de tareas: valores iniciales y rechazo de campos no válidos.
   const tarea=A.crearTarea({title:'Paseo',date:fecha,time:'09:30',assignee:'Ana'});
   igual('Estado inicial',tarea.status,'pendiente');comprobar('Identificador generado',tarea.id.length>5);
   rechaza('No acepta título vacío',()=>A.crearTarea({title:' ',date:fecha}));
@@ -30,6 +38,8 @@
   rechaza('No acepta identificador inyectado',()=>A.validarTarea({...tarea,id:'"] img'}));
   rechaza('No acepta copia ajena',()=>A.validarDocumento({version:2,tasks:[]}));
   rechaza('No acepta ids duplicados',()=>A.validarDocumento({version:1,tasks:[tarea,tarea]}));
+
+  // Casos de repetición: tareas diarias, semanales y en días laborables.
   const diaria=A.crearSerie({title:'Agua',date:fecha},'diaria',7);
   igual('Siete tareas diarias',diaria.length,7);igual('Última diaria',diaria.at(-1).date,'2026-11-30');
   comprobar('Serie con id común',diaria.every(t=>t.seriesId===diaria[0].seriesId));comprobar('Tareas con ids diferentes',new Set(diaria.map(t=>t.id)).size===7);
@@ -39,6 +49,8 @@
   igual('Búsqueda sin tildes y por responsable',A.filtrar([tarea],{busqueda:'ana'}).length,1);
   const conTilde=A.crearTarea({title:'Preparar alimentación',date:fecha});igual('Búsqueda sin acentos',A.filtrar([conTilde],{busqueda:'ALIMENTACION'}).length,1);
   igual('Filtro de estado',A.filtrar([tarea],{estado:'hecha'}).length,0);
+
+  // Casos de persistencia, cambios externos, datos dañados y falta de espacio.
   const st=memoria(),almacen=A.crearAlmacen(st,'prueba');igual('Almacén nuevo vacío',almacen.cargar().tasks.length,0);
   almacen.modificar(ts=>ts.concat(tarea));igual('Persistencia',A.crearAlmacen(st,'prueba').cargar().tasks[0].title,'Paseo');
   const otro=A.crearAlmacen(st,'prueba');otro.modificar(ts=>ts.concat(conTilde));almacen.modificar(ts=>ts.map(t=>t.id===tarea.id?{...t,status:'hecha'}:t));
